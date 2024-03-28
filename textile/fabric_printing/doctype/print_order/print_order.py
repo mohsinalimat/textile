@@ -78,7 +78,7 @@ class PrintOrder(TextileOrder):
 		self.set_delivery_status()
 		self.set_status()
 
-		self.set_title(self.fabric_material, self.total_print_length)
+		self.set_fabric_title(self.fabric_material, self.total_print_length)
 
 	def before_update_after_submit(self):
 		self.validate_dates()

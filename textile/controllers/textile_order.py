@@ -8,7 +8,7 @@ from erpnext.stock.get_item_details import get_bin_details, is_item_uom_converti
 
 
 class TextileOrder(StatusUpdaterERP):
-	def set_title(self, fabric_material, qty):
+	def set_fabric_title(self, fabric_material, qty):
 		fabric_material_abbr = None
 		if fabric_material:
 			fabric_material_abbr = frappe.get_cached_value("Fabric Material", fabric_material, "abbreviation")
