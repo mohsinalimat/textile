@@ -944,7 +944,7 @@ def update_status(pretreatment_order, status):
 def start_pretreatment_order(pretreatment_order):
 	frappe.has_permission("Pretreatment Order", "write", throw=True)
 
-	doc = frappe.get_doc('Pretreatment Order', pretreatment_order)
+	doc = frappe.get_doc('Pretreatment Order', pretreatment_order, for_update=True)
 
 	if doc.docstatus != 1:
 		frappe.throw(_("Pretreatment Order {0} is not submitted").format(doc.name))
@@ -1084,34 +1084,20 @@ def make_delivery_note(source_name, target_doc=None):
 
 @frappe.whitelist()
 def make_sales_invoice(source_name, target_doc=None):
-	from erpnext.controllers.queries import _get_sales_orders_to_be_billed, _get_delivery_notes_to_be_billed
-	from erpnext.selling.doctype.sales_order.sales_order import make_sales_invoice as invoice_from_sales_order
+	from erpnext.controllers.queries import _get_delivery_notes_to_be_billed
 	from erpnext.stock.doctype.delivery_note.delivery_note import make_sales_invoice as invoice_from_delivery_note
 
 	doc = frappe.get_doc("Pretreatment Order", source_name)
 
-	if doc.delivery_required:
-		dn_items = frappe.get_all("Delivery Note Item", filters={"pretreatment_order": doc.name}, fields=["name", "parent"])
-		dn_names = list(set([d.parent for d in dn_items]))
-		if not dn_names:
-			frappe.throw(_("There are no Delivery Notes to be delivered"))
+	dn_items = frappe.get_all("Delivery Note Item", filters={"pretreatment_order": doc.name}, fields=["name", "parent"])
+	dn_names = list(set([d.parent for d in dn_items]))
 
+	if dn_names:
 		frappe.flags.selected_children = {"items": [d.name for d in dn_items]}
 
 		delivery_notes = _get_delivery_notes_to_be_billed(filters={"name": ["in", dn_names]})
 		for d in delivery_notes:
 			target_doc = invoice_from_delivery_note(d.name, target_doc=target_doc)
-	else:
-		so_items = frappe.get_all("Sales Order Item", filters={"pretreatment_order": doc.name}, fields=["name", "parent"])
-		so_names = list(set([d.parent for d in so_items]))
-		if not so_names:
-			frappe.throw(_("There are no Sales Orders to be delivered"))
-
-		frappe.flags.selected_children = {"items": [d.name for d in so_items]}
-
-		sales_orders = _get_sales_orders_to_be_billed(filters={"name": ["in", so_names]})
-		for d in sales_orders:
-			target_doc = invoice_from_sales_order(d.name, target_doc=target_doc)
 
 	return target_doc
 
@@ -1220,27 +1206,15 @@ def _get_pretreatment_orders_to_be_billed(doctype="Pretreatment Order", txt="", 
 		from `tabPretreatment Order`
 		where `tabPretreatment Order`.docstatus = 1
 			and `tabPretreatment Order`.`{key}` like {txt}
-			and (
-				(`tabPretreatment Order`.delivery_required = 0 and exists(
-					select so.name
-					from `tabSales Order Item` soi
-					inner join `tabSales Order` so on so.name = soi.parent
-					where soi.pretreatment_order = `tabPretreatment Order`.name
-						and so.docstatus = 1
-						and so.status not in ('Closed', 'On Hold')
-						and so.billing_status = 'To Bill'
-						and soi.qty > soi.billed_qty + soi.returned_qty
-				))
-				or (`tabPretreatment Order`.delivery_required = 1 and exists(
-					select dn.name
-					from `tabDelivery Note Item` dni
-					inner join `tabDelivery Note` dn on dn.name = dni.parent
-					where dni.pretreatment_order = `tabPretreatment Order`.name
-						and dn.docstatus = 1
-						and dn.status not in ('Closed', 'On Hold')
-						and dn.billing_status = 'To Bill'
-						and dni.qty > dni.billed_qty + dni.returned_qty
-				))
+			and exists(
+				select dn.name
+				from `tabDelivery Note Item` dni
+				inner join `tabDelivery Note` dn on dn.name = dni.parent
+				where dni.pretreatment_order = `tabPretreatment Order`.name
+					and dn.docstatus = 1
+					and dn.status not in ('Closed', 'On Hold')
+					and dn.billing_status = 'To Bill'
+					and dni.qty > dni.billed_qty + dni.returned_qty
 			)
 			{fcond} {mcond}
 		order by `tabPretreatment Order`.transaction_date, `tabPretreatment Order`.creation
