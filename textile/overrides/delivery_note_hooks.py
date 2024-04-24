@@ -69,7 +69,8 @@ class DeliveryNoteDP(DeliveryNote):
 
 	def get_skip_sales_invoice(self, row):
 		is_return_fabric = is_row_return_fabric(self, row)
-		if is_return_fabric:
+		is_customer_provided = frappe.get_cached_value("Item", row.item_code, "is_customer_provided_item")
+		if is_return_fabric and is_customer_provided:
 			return True
 
 
