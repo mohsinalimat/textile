@@ -254,7 +254,7 @@ textile.PretreatmentOrder = class PretreatmentOrder extends textile.TextileOrder
 					add_min_width: 0.5,
 				},
 				{
-					title: __("<b>Ready to Pack:</b> {0} {1}", [format_number(to_pack_qty), "Meter"]),
+					title: __("<b>To Pack:</b> {0} {1}", [format_number(to_pack_qty), "Meter"]),
 					completed_qty: to_pack_qty,
 					progress_class: "progress-bar-warning",
 				},
