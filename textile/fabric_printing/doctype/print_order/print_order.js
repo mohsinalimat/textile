@@ -671,8 +671,8 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 			d.print_length = flt(d.print_length, precision("print_length", d));
 			d.fabric_length = flt(d.fabric_length, precision("fabric_length", d));
 
-			d.stock_print_length = d.print_length * conversion_factor;
-			d.stock_fabric_length = d.fabric_length * conversion_factor;
+			d.stock_print_length = flt(d.print_length * conversion_factor, 6);
+			d.stock_fabric_length = flt(d.fabric_length * conversion_factor, 6);
 
 			d.panel_qty = d.panel_length_meter ? d.stock_print_length / d.panel_length_meter : 0;
 			d.panel_qty = flt(d.panel_qty, precision("panel_qty", d));

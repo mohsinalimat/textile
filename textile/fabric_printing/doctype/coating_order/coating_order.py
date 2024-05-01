@@ -92,7 +92,7 @@ class CoatingOrder(TextileOrder):
 	def calculate_totals(self):
 		self.round_floats_in(self)
 		conversion_factor = self.get_conversion_factor()
-		self.stock_qty = self.qty * conversion_factor
+		self.stock_qty = flt(self.qty * conversion_factor, 6)
 
 	def set_default_coating_bom(self):
 		self.coating_bom = get_default_coating_bom(self.coating_item, throw=self.docstatus == 1)

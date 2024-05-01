@@ -223,7 +223,7 @@ class PretreatmentOrder(TextileOrder):
 	def calculate_totals(self):
 		self.round_floats_in(self)
 		conversion_factor = self.get_conversion_factor()
-		self.stock_qty = self.qty * conversion_factor
+		self.stock_qty = flt(self.qty * conversion_factor, 6)
 
 	def get_conversion_factor(self):
 		conversion_factors = get_textile_conversion_factors()
