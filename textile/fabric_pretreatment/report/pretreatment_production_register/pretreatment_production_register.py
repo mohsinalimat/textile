@@ -148,6 +148,12 @@ class PretreatmentProductionRegister:
 		if len(uoms) == 1:
 			totals.uom = list(uoms)[0]
 
+		if data:
+			if 'pretreatment_order' in grouped_by:
+				totals.customer = data[0].get('customer')
+				totals.greige_fabric = data[0].get('greige_fabric')
+				totals.ready_fabric = data[0].get('ready_fabric')
+
 		group_reference_doctypes = {
 			"greige_fabric": "Item",
 		}
@@ -171,6 +177,9 @@ class PretreatmentProductionRegister:
 
 		if totals.get('greige_fabric'):
 			totals['greige_fabric_name'] = data[0].greige_fabric_name
+
+		if totals.get('ready_fabric'):
+			totals['ready_fabric_name'] = data[0].ready_fabric_name
 
 		if totals.get('customer'):
 			totals['customer_name'] = data[0].customer_name

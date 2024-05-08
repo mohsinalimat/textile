@@ -42,17 +42,15 @@ class CoatingProductionRegister:
 				se.coating_order, se.fg_completed_qty as qty,
 				co.stock_uom as uom,
 				co.customer, co.customer_name,
-				co.fabric_item as fabric_item, co.fabric_item_name as fabric_item_name,
+				co.fabric_item, co.fabric_item_name,
+				co.coating_item, co.coating_item_name,
 				item.net_weight_per_unit, item.weight_uom
 			FROM `tabStock Entry` se
-			INNER JOIN `tabCoating Order` co
-				ON co.name = se.coating_order
-			LEFT JOIN `tabItem` item
-				ON item.name = co.fabric_item
+			INNER JOIN `tabCoating Order` co ON co.name = se.coating_order
+			LEFT JOIN `tabItem` item ON item.name = co.fabric_item
 			WHERE se.docstatus = 1
 				AND se.posting_date between %(from_date)s AND %(to_date)s
 				AND se.purpose = 'Manufacture'
-				AND ifnull(se.coating_order, '') != ''
 				{conditions}
 			ORDER BY se.posting_date, se.posting_time
 		""".format(conditions=conditions), self.filters, as_dict=1)
@@ -78,6 +76,9 @@ class CoatingProductionRegister:
 
 		if self.filters.fabric_item:
 			conditions.append("co.fabric_item = %(fabric_item)s")
+
+		if self.filters.coating_item:
+			conditions.append("co.coating_item = %(coating_item)s")
 
 		if self.filters.fabric_material:
 			conditions.append("item.fabric_material = %(fabric_material)s")
@@ -144,8 +145,15 @@ class CoatingProductionRegister:
 		if len(uoms) == 1:
 			totals.uom = list(uoms)[0]
 
+		if data:
+			if 'coating_order' in grouped_by:
+				totals.customer = data[0].get('customer')
+				totals.fabric_item = data[0].get('fabric_item')
+				totals.coating_item = data[0].get('coating_item')
+
 		group_reference_doctypes = {
 			"fabric_item": "Item",
+			"coating_item": "Item",
 		}
 
 		# set reference field
@@ -167,6 +175,9 @@ class CoatingProductionRegister:
 
 		if totals.get('fabric_item'):
 			totals['fabric_item_name'] = data[0].fabric_item_name
+
+		if totals.get('coating_item'):
+			totals['coating_item_name'] = data[0].coating_item_name
 
 		if totals.get('customer'):
 			totals['customer_name'] = data[0].customer_name
@@ -268,8 +279,21 @@ class CoatingProductionRegister:
 				"label": _("Fabric Item Name"),
 				"fieldname": "fabric_item_name",
 				"fieldtype": "Data",
-				"width": 320
-			}
+				"width": 250
+			},
+			{
+				"label": _("Coating Item"),
+				"fieldname": "coating_item",
+				"fieldtype": "Link",
+				"options": "Item",
+				"width": 100 if self.show_item_name else 150
+			},
+			{
+				"label": _("Coating Item Name"),
+				"fieldname": "coating_item_name",
+				"fieldtype": "Data",
+				"width": 160
+			},
 		]
 
 		exclude_columns = set()
@@ -280,7 +304,7 @@ class CoatingProductionRegister:
 				"fieldname": "reference",
 				"fieldtype": "Dynamic Link",
 				"options": "reference_type",
-				"width": 300
+				"width": 200
 			})
 
 			exclude_columns.add('stock_entry')
@@ -305,6 +329,10 @@ class CoatingProductionRegister:
 
 		if not self.show_customer_name:
 			exclude_columns.add('customer_name')
+
+		if not self.show_item_name:
+			exclude_columns.add('fabric_item_name')
+			exclude_columns.add('coating_item_name')
 
 		columns = [c for c in columns if c['fieldname'] not in exclude_columns]
 

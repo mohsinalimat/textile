@@ -98,6 +98,21 @@ frappe.query_reports["Print Production Register"] = {
 			},
 		},
 		{
+			fieldname: "softener_item",
+			label: __("Softener Item"),
+			fieldtype: "Link",
+			options: "Item",
+			get_query: function() {
+				return {
+					query: "erpnext.controllers.queries.item_query",
+					filters: {
+						'textile_item_type': "Process Component",
+						'process_component': "Softener",
+					}
+				};
+			},
+		},
+		{
 			"fieldname":"fabric_printer",
 			"label": __("Fabric Printer"),
 			"fieldtype": "Link",

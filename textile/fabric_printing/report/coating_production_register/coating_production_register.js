@@ -8,6 +8,7 @@ let group_field_opts = [
 	"Group by Customer",
 	"Group by Fabric Item",
 	"Group by Coating Order",
+	"Group by Coating Item",
 ];
 
 frappe.query_reports["Coating Production Register"] = {
@@ -80,6 +81,21 @@ frappe.query_reports["Coating Production Register"] = {
 				}
 				return frappe.db.get_link_options('Coating Order', txt, filters);
 			}
+		},
+		{
+			fieldname: "coating_item",
+			label: __("Coating Item"),
+			fieldtype: "Link",
+			options: "Item",
+			get_query: function() {
+				return {
+					query: "erpnext.controllers.queries.item_query",
+					filters: {
+						'textile_item_type': "Process Component",
+						'process_component': "Coating",
+					}
+				};
+			},
 		},
 		{
 			fieldname: "group_by_1",

@@ -45,16 +45,15 @@ class PrintProductionRegister:
 				wo.production_item as design_item, wo.item_name as design_item_name,
 				wo.process_item, wo.process_item_name,
 				wo.fabric_item, wo.fabric_item_name,
+				pro.softener_item, pro.softener_item_name,
 				item.net_weight_per_unit, item.weight_uom
 			FROM `tabStock Entry` se
-			INNER JOIN `tabWork Order` wo
-				ON wo.name = se.work_order
-			LEFT JOIN `tabItem` item
-				ON item.name = wo.fabric_item
+			INNER JOIN `tabWork Order` wo ON wo.name = se.work_order
+			INNER JOIN `tabPrint Order` pro ON pro.name = wo.print_order
+			LEFT JOIN `tabItem` item ON item.name = wo.fabric_item
 			WHERE se.docstatus = 1
 				AND se.posting_date between %(from_date)s AND %(to_date)s
 				AND se.purpose = 'Manufacture'
-				AND ifnull(wo.print_order, '') != ''
 				{conditions}
 			ORDER BY se.posting_date, se.posting_time, se.fabric_printer
 		""".format(conditions=conditions), self.filters, as_dict=1)
@@ -96,6 +95,9 @@ class PrintProductionRegister:
 
 		if self.filters.process_item:
 			conditions.append("wo.process_item = %(process_item)s")
+
+		if self.filters.softener_item:
+			conditions.append("pro.softener_item = %(softener_item)s")
 
 		if self.filters.fabric_printer:
 			conditions.append("se.fabric_printer = %(fabric_printer)s")
@@ -152,9 +154,17 @@ class PrintProductionRegister:
 		if len(uoms) == 1:
 			totals.uom = list(uoms)[0]
 
+		if data:
+			if 'print_order' in grouped_by:
+				totals.customer = data[0].get('customer')
+				totals.process_item = data[0].get('process_item')
+				totals.fabric_item = data[0].get('fabric_item')
+				totals.softener_item = data[0].get('softener_item')
+
 		group_reference_doctypes = {
 			"process_item": "Item",
 			"fabric_item": "Item",
+			"softener_item": "Item",
 		}
 
 		# set reference field
@@ -179,6 +189,9 @@ class PrintProductionRegister:
 
 		if totals.get('process_item'):
 			totals['process_item_name'] = data[0].process_item_name
+
+		if totals.get('softener_item'):
+			totals['softener_item_name'] = data[0].softener_item_name
 
 		if totals.get('customer'):
 			totals['customer_name'] = data[0].customer_name
@@ -327,6 +340,19 @@ class PrintProductionRegister:
 				"fieldtype": "Data",
 				"width": 160
 			},
+			{
+				"label": _("Softener Item"),
+				"fieldname": "softener_item",
+				"fieldtype": "Link",
+				"options": "Item",
+				"width": 100 if self.show_item_name else 150
+			},
+			{
+				"label": _("Softener Name"),
+				"fieldname": "softener_item_name",
+				"fieldtype": "Data",
+				"width": 160
+			},
 		]
 
 		exclude_columns = set()
@@ -372,6 +398,8 @@ class PrintProductionRegister:
 		if not self.show_item_name:
 			exclude_columns.add('fabric_item_name')
 			exclude_columns.add('design_item_name')
+			exclude_columns.add('softener_item_name')
+			exclude_columns.add('process_item_name')
 
 		columns = [c for c in columns if c['fieldname'] not in exclude_columns]
 
