@@ -31,15 +31,17 @@ def set_printed_fabric_details(self):
 	# Group fabrics and calculate totals
 	fabric_summary = {}
 	for item in self.items:
-		if not item.fabric_item or not item.is_printed_fabric:
+		if not item.fabric_item or (not item.is_printed_fabric and not item.is_return_fabric):
 			continue
 
-		fabric_dict = fabric_summary.setdefault(item.fabric_item, frappe._dict({
+		key = (item.fabric_item, cint(item.is_return_fabric))
+		fabric_dict = fabric_summary.setdefault(key, frappe._dict({
 			"fabric_item": item.fabric_item,
-			"fabric_item_name": item.fabric_item_name,
+			"fabric_item_name": item.fabric_item_name + (" (Return Fabric)" if cint(item.is_return_fabric) else ""),
 			"fabric_qty": 0,
 			"fabric_rate": 0,
 			"fabric_amount": 0,
+			"is_return_fabric": cint(item.is_return_fabric),
 		}))
 
 		fabric_dict.fabric_qty += flt(item.stock_qty)
@@ -50,13 +52,13 @@ def set_printed_fabric_details(self):
 		fabric_dict.fabric_rate = fabric_dict.fabric_amount / fabric_dict.fabric_qty if fabric_dict.fabric_qty else 0
 
 	# Update rows
-	def get_row(fabric_item):
-		existing_rows = [d for d in self.printed_fabrics if d.fabric_item == fabric_item]
+	def get_row(fabric_item, is_return_fabric):
+		existing_rows = [d for d in self.printed_fabrics if d.fabric_item == fabric_item and cint(d.is_return_fabric) == is_return_fabric]
 		return existing_rows[0] if existing_rows else None
 
 	rows = []
 	for i, fabric_dict in enumerate(fabric_summary.values()):
-		row = get_row(fabric_dict.fabric_item)
+		row = get_row(fabric_dict.fabric_item, cint(fabric_dict.is_return_fabric))
 		if not row:
 			row = self.append("printed_fabrics")
 

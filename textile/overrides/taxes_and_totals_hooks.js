@@ -38,24 +38,28 @@ textile.set_printed_fabric_details = function () {
 		return;
 	}
 
+	const get_key = (obj) => cstr([obj.fabric_item, cint(obj.is_return_fabric)]);
+
 	// Group fabrics and calculate totals
 	let fabric_summary = {}
 	for (let item of this.frm.doc.items) {
-		if (!item.fabric_item || !item.is_printed_fabric) {
+		if (!item.fabric_item || (!item.is_printed_fabric && !item.is_return_fabric)) {
 			continue;
 		}
 
 		let empty_row = {
 			"fabric_item": item.fabric_item,
-			"fabric_item_name": item.fabric_item_name,
+			"fabric_item_name": item.is_return_fabric ? item.fabric_item_name + " (Return Fabric)" : item.fabric_item_name,
 			"fabric_qty": 0,
 			"fabric_rate": 0,
 			"fabric_amount": 0,
+			"is_return_fabric": cint(item.is_return_fabric),
 		}
 
-		let fabric_dict = fabric_summary[item.fabric_item];
+		let key = get_key(item);
+		let fabric_dict = fabric_summary[key];
 		if (!fabric_dict) {
-			fabric_dict = fabric_summary[item.fabric_item] = Object.assign({}, empty_row);
+			fabric_dict = fabric_summary[key] = Object.assign({}, empty_row);
 		}
 
 		fabric_dict.fabric_qty += flt(item.stock_qty);
@@ -68,13 +72,18 @@ textile.set_printed_fabric_details = function () {
 	}
 
 	// Update Rows
-	const get_row = (fabric_item) => {
-		let existing_rows = (this.frm.doc.printed_fabrics || []).filter(d => d.fabric_item == fabric_item);
+	const get_row = (fabric_item, is_return_fabric) => {
+		let existing_rows = (this.frm.doc.printed_fabrics || []).filter((d) => {
+			return (
+				d.fabric_item == fabric_item
+				&& cint(d.is_return_fabric) == cint(is_return_fabric)
+			)
+		});
 		return existing_rows.length ? existing_rows[0] : null;
 	}
 
 	for (let fabric_dict of Object.values(fabric_summary)) {
-		let row = get_row(fabric_dict.fabric_item);
+		let row = get_row(fabric_dict.fabric_item, fabric_dict.is_return_fabric);
 		if (!row) {
 			row = this.frm.add_child("printed_fabrics");
 		}
@@ -84,7 +93,8 @@ textile.set_printed_fabric_details = function () {
 
 	// Reset removed fabrics rows
 	for (let printed_fabric_row of this.frm.doc.printed_fabrics || []) {
-		if (!fabric_summary[printed_fabric_row.fabric_item]) {
+		let key = get_key(printed_fabric_row);
+		if (!fabric_summary[key]) {
 			printed_fabric_row.fabric_qty = 0;
 			printed_fabric_row.fabric_rate = 0;
 			printed_fabric_row.fabric_amount = 0;
@@ -98,7 +108,11 @@ textile.set_printed_fabric_rate = function (frm, printed_fabric_row) {
 	}
 
 	for (let d of frm.doc.items || []) {
-		if (d.fabric_item == printed_fabric_row.fabric_item && d.is_printed_fabric) {
+		if (
+			(d.fabric_item == printed_fabric_row.fabric_item)
+			&& (d.is_printed_fabric || d.is_return_fabric)
+			&& (cint(d.is_return_fabric) == cint(printed_fabric_row.is_return_fabric))
+		) {
 			d.rate = flt(printed_fabric_row.fabric_rate) * flt(d.conversion_factor || 1);
 			frm.cscript.set_item_rate(d);
 		}
