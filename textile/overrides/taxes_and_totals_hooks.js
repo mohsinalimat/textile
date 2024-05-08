@@ -49,7 +49,7 @@ textile.set_printed_fabric_details = function () {
 
 		let empty_row = {
 			"fabric_item": item.fabric_item,
-			"fabric_item_name": item.is_return_fabric ? item.fabric_item_name + " (Return Fabric)" : item.fabric_item_name,
+			"fabric_item_name": item.fabric_item_name + (item.is_return_fabric ? " (Return Fabric)" : ""),
 			"fabric_qty": 0,
 			"fabric_rate": 0,
 			"fabric_amount": 0,
@@ -109,9 +109,9 @@ textile.set_printed_fabric_rate = function (frm, printed_fabric_row) {
 
 	for (let d of frm.doc.items || []) {
 		if (
-			(d.fabric_item == printed_fabric_row.fabric_item)
-			&& (d.is_printed_fabric || d.is_return_fabric)
-			&& (cint(d.is_return_fabric) == cint(printed_fabric_row.is_return_fabric))
+			(d.is_printed_fabric || d.is_return_fabric)
+			&& d.fabric_item == printed_fabric_row.fabric_item
+			&& cint(d.is_return_fabric) == cint(printed_fabric_row.is_return_fabric)
 		) {
 			d.rate = flt(printed_fabric_row.fabric_rate) * flt(d.conversion_factor || 1);
 			frm.cscript.set_item_rate(d);

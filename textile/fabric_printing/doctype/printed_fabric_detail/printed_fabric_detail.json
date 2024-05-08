@@ -8,10 +8,10 @@
  "field_order": [
   "fabric_item",
   "fabric_item_name",
+  "is_return_fabric",
   "fabric_qty",
   "fabric_rate",
-  "fabric_amount",
-  "is_return_fabric"
+  "fabric_amount"
  ],
  "fields": [
   {
@@ -34,6 +34,7 @@
    "read_only": 1
   },
   {
+   "bold": 1,
    "columns": 1,
    "fieldname": "fabric_qty",
    "fieldtype": "Float",
@@ -63,14 +64,14 @@
    "fieldname": "is_return_fabric",
    "fieldtype": "Check",
    "in_list_view": 1,
-   "label": "Is Return Fabric",
+   "label": "Return Fabric",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-05-02 16:56:53.144375",
+ "modified": "2024-05-08 17:06:59.560747",
  "modified_by": "Administrator",
  "module": "Fabric Printing",
  "name": "Printed Fabric Detail",

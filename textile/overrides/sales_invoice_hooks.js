@@ -52,16 +52,24 @@ frappe.ui.form.on("Printed Fabric Detail", {
 
 	before_printed_fabrics_remove: function(frm, cdt, cdn) {
 		let printed_fabric_row = frappe.get_doc(cdt, cdn);
-		var parent_field = frm.get_field('items');
+		let parent_field = frm.get_field('items');
+		if (!parent_field) {
+			return;
+		}
 
-		if (parent_field) {
-			var rows = (frm.doc.items || []).filter(d => d.fabric_item === printed_fabric_row.fabric_item);
-			$.each(rows, function (i, row) {
-				let grid_row = parent_field.grid.grid_rows_by_docname[row.name];
-				if (grid_row) {
-					grid_row.remove();
-				}
-			});
+		let rows = (frm.doc.items || []).filter(d => {
+			return (
+				(d.is_printed_fabric || d.is_return_fabric)
+				&& d.fabric_item === printed_fabric_row.fabric_item
+				&& cint(d.is_return_fabric) == cint(printed_fabric_row.is_return_fabric)
+			)
+		});
+
+		for (let row of rows) {
+			let grid_row = parent_field.grid.grid_rows_by_docname[row.name];
+			if (grid_row) {
+				grid_row.remove();
+			}
 		}
 	}
 });
