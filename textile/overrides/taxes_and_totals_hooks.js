@@ -68,6 +68,9 @@ textile.set_printed_fabric_details = function () {
 
 	// Calculate Rate
 	for (let fabric_dict of Object.values(fabric_summary)) {
+		let fabric_qty_df = frappe.meta.get_docfield("Printed Fabric Detail", "fabric_qty", this.frm.doc.name);
+		let qty_precision = frappe.meta.get_field_precision(fabric_qty_df);
+		fabric_dict.fabric_qty = flt(fabric_dict.fabric_qty, qty_precision);
 		fabric_dict.fabric_rate = fabric_dict.fabric_qty ? fabric_dict.fabric_amount / fabric_dict.fabric_qty : 0;
 	}
 
@@ -98,23 +101,6 @@ textile.set_printed_fabric_details = function () {
 			printed_fabric_row.fabric_qty = 0;
 			printed_fabric_row.fabric_rate = 0;
 			printed_fabric_row.fabric_amount = 0;
-		}
-	}
-}
-
-textile.set_printed_fabric_rate = function (frm, printed_fabric_row) {
-	if (!printed_fabric_row.fabric_item) {
-		return;
-	}
-
-	for (let d of frm.doc.items || []) {
-		if (
-			(d.is_printed_fabric || d.is_return_fabric)
-			&& d.fabric_item == printed_fabric_row.fabric_item
-			&& cint(d.is_return_fabric) == cint(printed_fabric_row.is_return_fabric)
-		) {
-			d.rate = flt(printed_fabric_row.fabric_rate) * flt(d.conversion_factor || 1);
-			frm.cscript.set_item_rate(d);
 		}
 	}
 }

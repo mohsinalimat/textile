@@ -49,6 +49,7 @@ def set_printed_fabric_details(self):
 
 	# Calculate Rate
 	for fabric_dict in fabric_summary.values():
+		fabric_dict.fabric_qty = flt(fabric_dict.fabric_qty, self.precision("fabric_qty", "printed_fabrics"))
 		fabric_dict.fabric_rate = fabric_dict.fabric_amount / fabric_dict.fabric_qty if fabric_dict.fabric_qty else 0
 
 	# Update rows

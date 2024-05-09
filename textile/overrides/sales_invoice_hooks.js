@@ -76,8 +76,25 @@ frappe.ui.form.on("Sales Invoice Item", {
 
 frappe.ui.form.on("Printed Fabric Detail", {
 	fabric_rate: function(frm, cdt, cdn) {
-		let row = frappe.get_doc(cdt, cdn);
-		textile.set_printed_fabric_rate(frm, row);
+		let fabric_row = frappe.get_doc(cdt, cdn);
+		if (!fabric_row.fabric_item) {
+			return;
+		}
+
+		for (let item_row of frm.doc.items || []) {
+			if (
+				(item_row.is_printed_fabric || item_row.is_return_fabric)
+				&& item_row.fabric_item == fabric_row.fabric_item
+				&& cint(item_row.is_return_fabric) == cint(fabric_row.is_return_fabric)
+			) {
+				let fabric_qty_df = frappe.meta.get_docfield("Printed Fabric Detail", "fabric_qty", frm.doc.name);
+				let qty_precision = frappe.meta.get_field_precision(fabric_qty_df);
+
+				item_row.rate = flt(fabric_row.fabric_rate) * flt(flt(item_row.stock_qty, qty_precision) / item_row.qty);
+				frm.cscript.set_item_rate(item_row);
+			}
+		}
+
 		frm.cscript.calculate_taxes_and_totals();
 	},
 
