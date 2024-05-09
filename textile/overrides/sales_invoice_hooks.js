@@ -31,6 +31,37 @@ frappe.ui.form.on("Sales Invoice", {
 			);
 		}, __("Get Items From"));
 	},
+
+	onload: function (frm) {
+		$(frm.wrapper).on("grid-row-render", function (e, grid_row) {
+			frm.events.highlight_fabric_item_row(frm, grid_row);
+		});
+	},
+
+	highlight_fabric_item_rows: function(frm) {
+		let grid_rows = [...frm.fields_dict.items.grid.grid_rows, ...frm.fields_dict.printed_fabrics.grid.grid_rows];
+		for (let grid_row of grid_rows) {
+			frm.events.highlight_fabric_item_row(frm, grid_row);
+		}
+	},
+
+	highlight_fabric_item_row: function(frm, grid_row) {
+		let row = grid_row?.doc;
+		if (!row || !["Sales Invoice Item", "Printed Fabric Detail"].includes(row.doctype)) {
+			return;
+		}
+
+		grid_row.row.removeClass("highlight");
+
+		if (
+			frm.focused_printed_fabric_item
+			&& (row.is_printed_fabric || row.is_return_fabric || row.doctype == "Printed Fabric Detail")
+			&& row.fabric_item === frm.focused_printed_fabric_item
+			&& cint(row.is_return_fabric) == cint(frm.focused_printed_is_return_fabric)
+		) {
+			grid_row.row.addClass("highlight");
+		}
+	},
 });
 
 frappe.ui.form.on("Sales Invoice Item", {
@@ -48,6 +79,14 @@ frappe.ui.form.on("Printed Fabric Detail", {
 		let row = frappe.get_doc(cdt, cdn);
 		textile.set_printed_fabric_rate(frm, row);
 		frm.cscript.calculate_taxes_and_totals();
+	},
+
+	printed_fabrics_row_focused: function(frm, cdt, cdn) {
+		let row = frappe.get_doc(cdt, cdn);
+		frm.focused_printed_fabric_item = row.fabric_item;
+		frm.focused_printed_is_return_fabric = row.is_return_fabric;
+
+		frm.events.highlight_fabric_item_rows(frm);
 	},
 
 	before_printed_fabrics_remove: function(frm, cdt, cdn) {
@@ -71,5 +110,5 @@ frappe.ui.form.on("Printed Fabric Detail", {
 				grid_row.remove();
 			}
 		}
-	}
+	},
 });
