@@ -254,7 +254,7 @@ textile.PretreatmentOrder = class PretreatmentOrder extends textile.TextileOrder
 					add_min_width: 0.5,
 				},
 				{
-					title: __("<b>Ready to Pack:</b> {0} {1}", [format_number(to_pack_qty), "Meter"]),
+					title: __("<b>To Pack:</b> {0} {1}", [format_number(to_pack_qty), "Meter"]),
 					completed_qty: to_pack_qty,
 					progress_class: "progress-bar-warning",
 				},
@@ -370,7 +370,7 @@ textile.PretreatmentOrder = class PretreatmentOrder extends textile.TextileOrder
 		uom_to_convert = uom_to_convert.toLowerCase();
 		let conversion_factor = conversion_factors[uom_to_convert] || 1;
 
-		this.frm.doc.stock_qty = this.frm.doc.qty * conversion_factor;
+		this.frm.doc.stock_qty = flt(this.frm.doc.qty * conversion_factor, 6);
 
 		this.frm.refresh_fields();
 	}

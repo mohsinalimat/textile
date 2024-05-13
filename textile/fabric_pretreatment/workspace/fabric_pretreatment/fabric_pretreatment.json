@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"wnqL5KZOgb\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Fabric Pretreatment</span>\",\"col\":12}},{\"id\":\"gbTLWTXQj1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pretreatment Order\",\"col\":3}},{\"id\":\"H5--diJpnT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Work Order\",\"col\":3}},{\"id\":\"kpnzD9QMbL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivery Note\",\"col\":3}},{\"id\":\"CrmQaUl-rU\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item\",\"col\":3}},{\"id\":\"GVD6W4cyef\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Order\",\"col\":3}},{\"id\":\"Ha9hr_hlVg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Packing Slip\",\"col\":3}},{\"id\":\"lB1QHO0buz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer\",\"col\":3}},{\"id\":\"R-em3zHWHO\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"YQXzfwYdPt\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Pretreatment Orders To Confirm\",\"col\":3}},{\"id\":\"DnWeUIt6KM\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Pretreatment Orders In Production\",\"col\":3}},{\"id\":\"8AiAGm80wJ\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Pretreatment Orders To Pack\",\"col\":3}},{\"id\":\"yTsRhT0XBC\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Pretreatment Orders To Deliver\",\"col\":3}},{\"id\":\"sfERbwXWTq\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"Otfps9F9a8\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Fabric Pretreatment Documents</b></span>\",\"col\":12}},{\"id\":\"L8rG5ifCi8\",\"type\":\"card\",\"data\":{\"card_name\":\"Order\",\"col\":3}},{\"id\":\"DTOba1OLe7\",\"type\":\"card\",\"data\":{\"card_name\":\"Production\",\"col\":3}},{\"id\":\"H4HSiEH9mE\",\"type\":\"card\",\"data\":{\"card_name\":\"Fulfilment\",\"col\":3}},{\"id\":\"Wy_lJwaXfl\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":3}},{\"id\":\"euZJ1vg0er\",\"type\":\"card\",\"data\":{\"card_name\":\"Masters\",\"col\":3}},{\"id\":\"yfe7iYtiaN\",\"type\":\"card\",\"data\":{\"card_name\":\"Settings\",\"col\":3}}]",
+ "content": "[{\"id\":\"wnqL5KZOgb\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Fabric Pretreatment</span>\",\"col\":12}},{\"id\":\"gbTLWTXQj1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pretreatment Order\",\"col\":3}},{\"id\":\"H5--diJpnT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Work Order\",\"col\":3}},{\"id\":\"kpnzD9QMbL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivery Note\",\"col\":3}},{\"id\":\"CrmQaUl-rU\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item\",\"col\":3}},{\"id\":\"GVD6W4cyef\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Order\",\"col\":3}},{\"id\":\"Ha9hr_hlVg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Packing Label\",\"col\":3}},{\"id\":\"lB1QHO0buz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer\",\"col\":3}},{\"id\":\"R-em3zHWHO\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"YQXzfwYdPt\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Pretreatment Orders To Confirm\",\"col\":3}},{\"id\":\"DnWeUIt6KM\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Pretreatment Orders In Production\",\"col\":3}},{\"id\":\"8AiAGm80wJ\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Pretreatment Orders To Pack\",\"col\":3}},{\"id\":\"yTsRhT0XBC\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Pretreatment Orders To Deliver\",\"col\":3}},{\"id\":\"sfERbwXWTq\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"Otfps9F9a8\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Fabric Pretreatment Documents</b></span>\",\"col\":12}},{\"id\":\"L8rG5ifCi8\",\"type\":\"card\",\"data\":{\"card_name\":\"Order\",\"col\":3}},{\"id\":\"DTOba1OLe7\",\"type\":\"card\",\"data\":{\"card_name\":\"Production\",\"col\":3}},{\"id\":\"H4HSiEH9mE\",\"type\":\"card\",\"data\":{\"card_name\":\"Fulfilment\",\"col\":3}},{\"id\":\"Wy_lJwaXfl\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":3}},{\"id\":\"euZJ1vg0er\",\"type\":\"card\",\"data\":{\"card_name\":\"Masters\",\"col\":3}},{\"id\":\"yfe7iYtiaN\",\"type\":\"card\",\"data\":{\"card_name\":\"Settings\",\"col\":3}}]",
  "creation": "2024-01-25 15:24:37.832960",
  "custom_blocks": [],
  "docstatus": 0,
@@ -241,7 +241,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-03-18 15:05:12.970297",
+ "modified": "2024-05-10 14:57:41.642951",
  "modified_by": "Administrator",
  "module": "Fabric Pretreatment",
  "name": "Fabric Pretreatment",
@@ -283,10 +283,10 @@
   {
    "color": "Orange",
    "doc_view": "List",
-   "format": "{} To Deliver",
-   "label": "Sales Order",
-   "link_to": "Sales Order",
-   "stats_filter": "{\"per_delivered\":[\"<\",100],\"docstatus\":[\"=\",\"1\"],\"status\":[\"!=\",\"Closed\"]}",
+   "format": "{} Pending",
+   "label": "Work Order",
+   "link_to": "Work Order",
+   "stats_filter": "[[\"Work Order\",\"docstatus\",\"=\",\"1\",false],[\"Work Order\",\"status\",\"not in\",[\"Completed\",\"Stopped\",\"\"],false],[\"Work Order\",\"pretreatment_order\",\"is\",\"set\",false]]",
    "type": "DocType"
   },
   {
@@ -299,21 +299,30 @@
    "type": "DocType"
   },
   {
-   "color": "Blue",
+   "color": "Orange",
    "doc_view": "List",
-   "format": "{} In Stock",
-   "label": "Packing Slip",
-   "link_to": "Packing Slip",
-   "stats_filter": "{\"docstatus\":[\"=\",\"1\"],\"status\":[\"=\",\"In Stock\"]}",
+   "format": "{} Draft",
+   "label": "Delivery Note",
+   "link_to": "Delivery Note",
+   "stats_filter": "[[\"Delivery Note\",\"docstatus\",\"=\",\"0\",false],[\"Delivery Note Item\",\"pretreatment_order\",\"is\",\"set\",false]]",
    "type": "DocType"
   },
   {
    "color": "Orange",
    "doc_view": "List",
-   "format": "{} Pending",
-   "label": "Work Order",
-   "link_to": "Work Order",
-   "stats_filter": "{\"docstatus\":[\"=\",\"1\"],\"status\":[\"not in\",[\"Completed\",\"Stopped\",\"\"]]}",
+   "format": "{} To Deliver",
+   "label": "Sales Order",
+   "link_to": "Sales Order",
+   "stats_filter": "[[\"Sales Order\",\"per_delivered\",\"<\",100,false],[\"Sales Order\",\"docstatus\",\"=\",\"1\",false],[\"Sales Order\",\"status\",\"!=\",\"Closed\",false],[\"Sales Order Item\",\"pretreatment_order\",\"is\",\"set\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "format": "{} In Stock",
+   "label": "Packing Label",
+   "link_to": "Packing Slip",
+   "stats_filter": "[[\"Packing Slip\",\"docstatus\",\"=\",\"1\",false],[\"Packing Slip\",\"status\",\"=\",\"In Stock\",false],[\"Packing Slip Item\",\"pretreatment_order\",\"is\",\"set\",false]]",
    "type": "DocType"
   },
   {
@@ -332,15 +341,6 @@
    "label": "Customer",
    "link_to": "Customer",
    "stats_filter": "{\"disabled\":[\"=\",0]}",
-   "type": "DocType"
-  },
-  {
-   "color": "Orange",
-   "doc_view": "List",
-   "format": "{} Draft",
-   "label": "Delivery Note",
-   "link_to": "Delivery Note",
-   "stats_filter": "{\"docstatus\":[\"=\",\"0\"]}",
    "type": "DocType"
   }
  ],

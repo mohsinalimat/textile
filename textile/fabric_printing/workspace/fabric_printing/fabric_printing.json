@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"SDqkHndkYS\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Fabric Printing</span>\",\"col\":12}},{\"id\":\"o74uuOtKRT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Print Order\",\"col\":3}},{\"id\":\"zqUNJjBFdH\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Print Work Order\",\"col\":3}},{\"id\":\"bFETAi3-EQ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Packing Slip\",\"col\":3}},{\"id\":\"O6vyMD7pEJ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item\",\"col\":3}},{\"id\":\"Wlo_PlTWyC\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pretreatment Order\",\"col\":3}},{\"id\":\"bc_WeGR8V3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Print Order Packing\",\"col\":3}},{\"id\":\"Xmyb4jKIhr\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivery Note\",\"col\":3}},{\"id\":\"4O29Q-CIXU\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer\",\"col\":3}},{\"id\":\"2s8u4gxb4O\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Order\",\"col\":3}},{\"id\":\"yqYQmIzKGo\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Coating Order\",\"col\":3}},{\"id\":\"BxEHzbPcrr\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"so_MfXKSP6\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Print Orders To Confirm\",\"col\":3}},{\"id\":\"N0h-U00c9N\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Print Orders In Production\",\"col\":3}},{\"id\":\"wbBE9L0ywV\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Print Orders To Pack\",\"col\":3}},{\"id\":\"LJOVSkBHhz\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Print Orders To Deliver\",\"col\":3}},{\"id\":\"RoL32mNhHV\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"7Z6i10Ohdv\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Fabric Printing Documents</b></span>\",\"col\":12}},{\"id\":\"rZ6puD_WBV\",\"type\":\"card\",\"data\":{\"card_name\":\"Order\",\"col\":3}},{\"id\":\"lgIh2JSFqa\",\"type\":\"card\",\"data\":{\"card_name\":\"Production\",\"col\":3}},{\"id\":\"93NoRhdz5u\",\"type\":\"card\",\"data\":{\"card_name\":\"Fulfilment\",\"col\":3}},{\"id\":\"GlauzhQim3\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":3}},{\"id\":\"lp964HZE02\",\"type\":\"card\",\"data\":{\"card_name\":\"Masters\",\"col\":3}},{\"id\":\"Du3uJ2Yz7z\",\"type\":\"card\",\"data\":{\"card_name\":\"Settings\",\"col\":3}}]",
+ "content": "[{\"id\":\"SDqkHndkYS\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Fabric Printing</span>\",\"col\":12}},{\"id\":\"o74uuOtKRT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Print Order\",\"col\":3}},{\"id\":\"zqUNJjBFdH\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Print Work Order\",\"col\":3}},{\"id\":\"bFETAi3-EQ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Packing Label\",\"col\":3}},{\"id\":\"O6vyMD7pEJ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item\",\"col\":3}},{\"id\":\"Wlo_PlTWyC\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pretreatment Order\",\"col\":3}},{\"id\":\"bc_WeGR8V3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Print Order Packing\",\"col\":3}},{\"id\":\"Xmyb4jKIhr\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivery Note\",\"col\":3}},{\"id\":\"4O29Q-CIXU\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer\",\"col\":3}},{\"id\":\"2s8u4gxb4O\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Order\",\"col\":3}},{\"id\":\"yqYQmIzKGo\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Coating Order\",\"col\":3}},{\"id\":\"BxEHzbPcrr\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"so_MfXKSP6\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Print Orders To Confirm\",\"col\":3}},{\"id\":\"N0h-U00c9N\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Print Orders In Production\",\"col\":3}},{\"id\":\"wbBE9L0ywV\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Print Orders To Pack\",\"col\":3}},{\"id\":\"LJOVSkBHhz\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Print Orders To Deliver\",\"col\":3}},{\"id\":\"RoL32mNhHV\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"7Z6i10Ohdv\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Fabric Printing Documents</b></span>\",\"col\":12}},{\"id\":\"rZ6puD_WBV\",\"type\":\"card\",\"data\":{\"card_name\":\"Order\",\"col\":3}},{\"id\":\"lgIh2JSFqa\",\"type\":\"card\",\"data\":{\"card_name\":\"Production\",\"col\":3}},{\"id\":\"93NoRhdz5u\",\"type\":\"card\",\"data\":{\"card_name\":\"Fulfilment\",\"col\":3}},{\"id\":\"GlauzhQim3\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":3}},{\"id\":\"lp964HZE02\",\"type\":\"card\",\"data\":{\"card_name\":\"Masters\",\"col\":3}},{\"id\":\"Du3uJ2Yz7z\",\"type\":\"card\",\"data\":{\"card_name\":\"Settings\",\"col\":3}}]",
  "creation": "2023-03-08 13:30:34.124082",
  "custom_blocks": [],
  "docstatus": 0,
@@ -311,7 +311,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-03-15 14:16:45.810642",
+ "modified": "2024-05-10 14:58:22.318406",
  "modified_by": "Administrator",
  "module": "Fabric Printing",
  "name": "Fabric Printing",
@@ -351,6 +351,15 @@
  "sequence_id": 10.0,
  "shortcuts": [
   {
+   "color": "Blue",
+   "doc_view": "List",
+   "format": "{} In Stock",
+   "label": "Packing Label",
+   "link_to": "Packing Slip",
+   "stats_filter": "[[\"Packing Slip\",\"docstatus\",\"=\",\"1\",false],[\"Packing Slip\",\"status\",\"=\",\"In Stock\",false],[\"Packing Slip Item\",\"print_order\",\"is\",\"set\",false]]",
+   "type": "DocType"
+  },
+  {
    "color": "Orange",
    "doc_view": "List",
    "format": "{} In Progress",
@@ -371,6 +380,15 @@
   {
    "color": "Orange",
    "doc_view": "List",
+   "format": "{} Draft",
+   "label": "Delivery Note",
+   "link_to": "Delivery Note",
+   "stats_filter": "[[\"Delivery Note\",\"docstatus\",\"=\",\"0\",false],[\"Delivery Note Item\",\"print_order\",\"is\",\"set\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
    "format": "{} Pending",
    "label": "Print Work Order",
    "link_to": "print-work-order",
@@ -378,21 +396,12 @@
    "type": "Page"
   },
   {
-   "color": "Blue",
-   "doc_view": "List",
-   "format": "{} In Stock",
-   "label": "Packing Slip",
-   "link_to": "Packing Slip",
-   "stats_filter": "{\"docstatus\":[\"=\",\"1\"],\"status\":[\"=\",\"In Stock\"]}",
-   "type": "DocType"
-  },
-  {
    "color": "Orange",
    "doc_view": "List",
    "format": "{} To Deliver",
    "label": "Sales Order",
    "link_to": "Sales Order",
-   "stats_filter": "{\"status\":[\"!=\",\"Closed\"],\"docstatus\":[\"=\",\"1\"],\"per_delivered\":[\"<\",100]}",
+   "stats_filter": "[[\"Sales Order\",\"status\",\"!=\",\"Closed\",false],[\"Sales Order\",\"docstatus\",\"=\",\"1\",false],[\"Sales Order\",\"per_delivered\",\"<\",100,false],[\"Sales Order Item\",\"print_order\",\"is\",\"set\",false]]",
    "type": "DocType"
   },
   {
@@ -410,15 +419,6 @@
    "label": "Item",
    "link_to": "Item",
    "stats_filter": "{\"textile_item_type\":[\"=\",\"Printed Design\"],\"disabled\":[\"=\",0]}",
-   "type": "DocType"
-  },
-  {
-   "color": "Orange",
-   "doc_view": "List",
-   "format": "{} Draft",
-   "label": "Delivery Note",
-   "link_to": "Delivery Note",
-   "stats_filter": "{\"docstatus\":[\"=\",\"0\"]}",
    "type": "DocType"
   },
   {

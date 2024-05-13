@@ -671,8 +671,8 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 			d.print_length = flt(d.print_length, precision("print_length", d));
 			d.fabric_length = flt(d.fabric_length, precision("fabric_length", d));
 
-			d.stock_print_length = d.print_length * conversion_factor;
-			d.stock_fabric_length = d.fabric_length * conversion_factor;
+			d.stock_print_length = flt(d.print_length * conversion_factor, 6);
+			d.stock_fabric_length = flt(d.fabric_length * conversion_factor, 6);
 
 			d.panel_qty = d.panel_length_meter ? d.stock_print_length / d.panel_length_meter : 0;
 			d.panel_qty = flt(d.panel_qty, precision("panel_qty", d));
@@ -967,7 +967,7 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					add_min_width: 0.5,
 				},
 				{
-					title: __("<b>Ready to Pack:</b> {0} {1}", [format_number(to_pack_qty), "Meter"]),
+					title: __("<b>To Pack:</b> {0} {1}", [format_number(to_pack_qty), "Meter"]),
 					completed_qty: to_pack_qty,
 					progress_class: "progress-bar-warning",
 				},
