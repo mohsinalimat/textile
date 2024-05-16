@@ -43,7 +43,7 @@ textile.set_printed_fabric_details = function () {
 	// Group fabrics and calculate totals
 	let fabric_summary = {}
 	for (let item of this.frm.doc.items) {
-		if (!item.fabric_item || (!item.is_printed_fabric && !item.is_return_fabric)) {
+		if (!item.fabric_item || (item.textile_item_type != "Printed Design" && !item.is_return_fabric)) {
 			continue;
 		}
 
