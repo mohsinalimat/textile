@@ -41,6 +41,7 @@ doc_events = {
 
 override_doctype_class = {
 	"Item": "textile.overrides.item_hooks.ItemDP",
+	"Quotation": "textile.overrides.quotation_hooks.QuotationDP",
 	"Sales Order": "textile.overrides.sales_order_hooks.SalesOrderDP",
 	"Delivery Note": "textile.overrides.delivery_note_hooks.DeliveryNoteDP",
 	"Sales Invoice": "textile.overrides.sales_invoice_hooks.SalesInvoiceDP",
