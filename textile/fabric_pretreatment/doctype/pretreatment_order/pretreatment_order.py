@@ -58,7 +58,7 @@ class PretreatmentOrder(TextileOrder):
 		self.set_delivery_status()
 		self.set_status()
 
-		self.set_title(self.greige_fabric_material, self.stock_qty)
+		self.set_fabric_title(self.greige_fabric_material, self.stock_qty)
 
 	def before_update_after_submit(self):
 		self.validate_dates()

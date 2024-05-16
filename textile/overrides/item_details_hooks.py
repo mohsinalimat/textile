@@ -18,7 +18,7 @@ def stock_entry_get_item_details(args, out):
 
 
 def set_fabric_item_details(args, item, out):
-	out.is_printed_fabric = cint(item.textile_item_type == "Printed Design")
+	out.textile_item_type = item.textile_item_type
 
 	if item.textile_item_type in ("Greige Fabric", "Ready Fabric"):
 		out.update({

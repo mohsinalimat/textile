@@ -224,9 +224,11 @@ fixtures = [
 				'Item Source-textile_item_type',
 				'Brand-textile_item_type',
 
+				'Quotation-textile_item_type',
+
 				'Sales Order Item-fabric_item',
 				'Sales Order Item-fabric_item_name',
-				'Sales Order Item-is_printed_fabric',
+				'Sales Order Item-textile_item_type',
 				'Sales Order Item-pretreatment_order',
 				'Sales Order Item-print_order',
 				'Sales Order Item-print_order_item',
@@ -236,7 +238,7 @@ fixtures = [
 
 				'Delivery Note Item-fabric_item',
 				'Delivery Note Item-fabric_item_name',
-				'Delivery Note Item-is_printed_fabric',
+				'Delivery Note Item-textile_item_type',
 				'Delivery Note Item-pretreatment_order',
 				'Delivery Note Item-print_order',
 				'Delivery Note Item-print_order_item',
@@ -250,7 +252,7 @@ fixtures = [
 
 				'Sales Invoice Item-fabric_item',
 				'Sales Invoice Item-fabric_item_name',
-				'Sales Invoice Item-is_printed_fabric',
+				'Sales Invoice Item-textile_item_type',
 				'Sales Invoice Item-pretreatment_order',
 				'Sales Invoice Item-print_order',
 				'Sales Invoice Item-print_order_item',

@@ -31,7 +31,7 @@ def set_printed_fabric_details(self):
 	# Group fabrics and calculate totals
 	fabric_summary = {}
 	for item in self.items:
-		if not item.fabric_item or (not item.is_printed_fabric and not item.is_return_fabric):
+		if not item.fabric_item or (item.textile_item_type != "Printed Design" and not item.is_return_fabric):
 			continue
 
 		key = (item.fabric_item, cint(item.is_return_fabric))

@@ -55,7 +55,7 @@ frappe.ui.form.on("Sales Invoice", {
 
 		if (
 			frm.focused_printed_fabric_item
-			&& (row.is_printed_fabric || row.is_return_fabric || row.doctype == "Printed Fabric Detail")
+			&& (row.textile_item_type == "Printed Design" || row.is_return_fabric || row.doctype == "Printed Fabric Detail")
 			&& row.fabric_item === frm.focused_printed_fabric_item
 			&& cint(row.is_return_fabric) == cint(frm.focused_printed_is_return_fabric)
 		) {
@@ -86,7 +86,7 @@ frappe.ui.form.on("Printed Fabric Detail", {
 
 		for (let item_row of frm.doc.items || []) {
 			if (
-				(item_row.is_printed_fabric || item_row.is_return_fabric)
+				(item_row.textile_item_type == "Printed Design" || item_row.is_return_fabric)
 				&& item_row.fabric_item == fabric_row.fabric_item
 				&& cint(item_row.is_return_fabric) == cint(fabric_row.is_return_fabric)
 			) {
@@ -122,7 +122,7 @@ frappe.ui.form.on("Printed Fabric Detail", {
 
 		let rows = (frm.doc.items || []).filter(d => {
 			return (
-				(d.is_printed_fabric || d.is_return_fabric)
+				(d.textile_item_type == "Printed Design" || d.is_return_fabric)
 				&& d.fabric_item === printed_fabric_row.fabric_item
 				&& cint(d.is_return_fabric) == cint(printed_fabric_row.is_return_fabric)
 			)

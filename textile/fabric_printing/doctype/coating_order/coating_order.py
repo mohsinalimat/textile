@@ -38,7 +38,7 @@ class CoatingOrder(TextileOrder):
 		self.set_coating_status()
 		self.set_status()
 
-		self.set_title(self.fabric_material, self.stock_qty)
+		self.set_fabric_title(self.fabric_material, self.stock_qty)
 
 	def on_submit(self):
 		self.validate_fabric_attributes()
