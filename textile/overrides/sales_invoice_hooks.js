@@ -81,16 +81,23 @@ frappe.ui.form.on("Printed Fabric Detail", {
 			return;
 		}
 
+		let fabric_qty_df = frappe.meta.get_docfield("Printed Fabric Detail", "fabric_qty", frm.doc.name);
+		let qty_precision = frappe.meta.get_field_precision(fabric_qty_df);
+
 		for (let item_row of frm.doc.items || []) {
 			if (
 				(item_row.is_printed_fabric || item_row.is_return_fabric)
 				&& item_row.fabric_item == fabric_row.fabric_item
 				&& cint(item_row.is_return_fabric) == cint(fabric_row.is_return_fabric)
 			) {
-				let fabric_qty_df = frappe.meta.get_docfield("Printed Fabric Detail", "fabric_qty", frm.doc.name);
-				let qty_precision = frappe.meta.get_field_precision(fabric_qty_df);
+				let conversion_factor = 1;
+				if (item_row.uom != item_row.stock_uom) {
+					conversion_factor = flt(item_row.qty)
+						? flt(item_row.stock_qty, qty_precision) / flt(item_row.qty)
+						: flt(item_row.conversion_factor);
+				}
 
-				item_row.rate = flt(fabric_row.fabric_rate) * flt(flt(item_row.stock_qty, qty_precision) / item_row.qty);
+				item_row.rate = flt(fabric_row.fabric_rate) * conversion_factor;
 				frm.cscript.set_item_rate(item_row);
 			}
 		}
