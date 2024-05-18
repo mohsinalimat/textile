@@ -53,54 +53,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Fulfilment",
-   "link_count": 4,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Delivery Note",
-   "link_count": 0,
-   "link_to": "Delivery Note",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Packing Slip",
-   "link_count": 0,
-   "link_to": "Packing Slip",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Sales Invoice",
-   "link_count": 0,
-   "link_to": "Sales Invoice",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Print Order Packing",
-   "link_count": 0,
-   "link_to": "print-order-packing",
-   "link_type": "Page",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Order",
    "link_count": 5,
    "onboard": 0,
@@ -159,8 +111,46 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "Settings",
+   "link_count": 3,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Fabric Printing Settings",
+   "link_count": 0,
+   "link_to": "Fabric Printing Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Print Process Rule",
+   "link_count": 0,
+   "link_to": "Print Process Rule",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Print Pricing Rule",
+   "link_count": 0,
+   "link_to": "Print Pricing Rule",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Production",
-   "link_count": 4,
+   "link_count": 6,
    "onboard": 0,
    "type": "Card Break"
   },
@@ -206,57 +196,69 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
-   "label": "Settings",
-   "link_count": 3,
+   "is_query_report": 1,
+   "label": "Print Production Register",
+   "link_count": 0,
+   "link_to": "Print Production Register",
+   "link_type": "Report",
    "onboard": 0,
-   "type": "Card Break"
+   "type": "Link"
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
-   "label": "Fabric Printing Settings",
+   "is_query_report": 1,
+   "label": "Coating Production Register",
    "link_count": 0,
-   "link_to": "Fabric Printing Settings",
-   "link_type": "DocType",
+   "link_to": "Coating Production Register",
+   "link_type": "Report",
    "onboard": 0,
    "type": "Link"
   },
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Print Process Rule",
-   "link_count": 0,
-   "link_to": "Print Process Rule",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Print Pricing Rule",
-   "link_count": 0,
-   "link_to": "Print Pricing Rule",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Reports",
+   "label": "Fulfilment",
    "link_count": 6,
    "onboard": 0,
    "type": "Card Break"
   },
   {
    "hidden": 0,
-   "is_query_report": 1,
-   "label": "Fabric Printing Summary",
+   "is_query_report": 0,
+   "label": "Delivery Note",
    "link_count": 0,
-   "link_to": "Fabric Printing Summary",
-   "link_type": "Report",
+   "link_to": "Delivery Note",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Packing Label",
+   "link_count": 0,
+   "link_to": "Packing Slip",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Sales Invoice",
+   "link_count": 0,
+   "link_to": "Sales Invoice",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Print Order Packing",
+   "link_count": 0,
+   "link_to": "print-order-packing",
+   "link_type": "Page",
    "onboard": 0,
    "type": "Link"
   },
@@ -282,10 +284,18 @@
   },
   {
    "hidden": 0,
+   "is_query_report": 0,
+   "label": "Reports",
+   "link_count": 3,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
    "is_query_report": 1,
-   "label": "Print Production Register",
+   "label": "Fabric Printing Summary",
    "link_count": 0,
-   "link_to": "Print Production Register",
+   "link_to": "Fabric Printing Summary",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
@@ -293,9 +303,9 @@
   {
    "hidden": 0,
    "is_query_report": 1,
-   "label": "Coating Production Register",
+   "label": "Fabric Ledger",
    "link_count": 0,
-   "link_to": "Coating Production Register",
+   "link_to": "Fabric Ledger",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
@@ -311,7 +321,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-05-10 14:58:22.318406",
+ "modified": "2024-05-18 06:00:09.952615",
  "modified_by": "Administrator",
  "module": "Fabric Printing",
  "name": "Fabric Printing",
