@@ -140,7 +140,7 @@ class CoatingOrder(TextileOrder):
 			""", self.name, as_dict=1)
 
 		self.coated_qty = flt(production_data[0].coated_qty) if production_data else 0
-		last_stock_entry_date = flt(production_data[0].actual_end_date) if production_data else 0
+		last_stock_entry_date = production_data[0].actual_end_date if production_data else 0
 
 		self.per_coated = flt(self.coated_qty / self.stock_qty * 100 if self.stock_qty else 0, 3)
 
