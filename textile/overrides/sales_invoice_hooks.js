@@ -81,25 +81,38 @@ frappe.ui.form.on("Printed Fabric Detail", {
 			return;
 		}
 
-		let fabric_qty_df = frappe.meta.get_docfield("Printed Fabric Detail", "fabric_qty", frm.doc.name);
-		let qty_precision = frappe.meta.get_field_precision(fabric_qty_df);
-
-		for (let item_row of frm.doc.items || []) {
-			if (
+		const is_fabric_item_row = (item_row) => {
+			return (
 				(item_row.textile_item_type == "Printed Design" || item_row.is_return_fabric)
 				&& item_row.fabric_item == fabric_row.fabric_item
 				&& cint(item_row.is_return_fabric) == cint(fabric_row.is_return_fabric)
-			) {
-				let conversion_factor = 1;
-				if (item_row.uom != item_row.stock_uom) {
-					conversion_factor = flt(item_row.qty)
-						? flt(item_row.stock_qty, qty_precision) / flt(item_row.qty)
-						: flt(item_row.conversion_factor);
-				}
+			)
+		};
 
-				item_row.rate = flt(fabric_row.fabric_rate) * conversion_factor;
-				frm.cscript.set_item_rate(item_row);
+		let fabric_item_rows = (frm.doc.items || []).filter(d => is_fabric_item_row(d));
+
+		let total_fabric_qty = frappe.utils.sum(fabric_item_rows.map(d => d.stock_qty));
+		let rounded_fabric_qty = flt(total_fabric_qty,
+			precision("fabric_qty", fabric_row));
+
+		let total_amount = flt(flt(fabric_row.fabric_rate) * rounded_fabric_qty,
+			precision("fabric_amount", fabric_row));
+		let remaining_amount = total_amount;
+
+		let last_row = fabric_item_rows.length ? fabric_item_rows[fabric_item_rows.length - 1] : null;
+		for (let item_row of fabric_item_rows) {
+			let amount = flt(total_amount * (flt(item_row.stock_qty) / total_fabric_qty),
+				precision("amount", item_row));
+
+			remaining_amount = flt(remaining_amount - amount, precision("amount", item_row));
+
+			if (item_row == last_row && remaining_amount) {
+				amount += remaining_amount;
+				amount = flt(amount, precision("amount", item_row));
 			}
+
+			item_row.rate = flt(amount / item_row.qty);
+			frm.cscript.set_item_rate(item_row);
 		}
 
 		frm.cscript.calculate_taxes_and_totals();
