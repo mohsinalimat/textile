@@ -105,7 +105,7 @@ class FabricLedger:
 				item.textile_item_type,
 				fabric_item.name as fabric_item, fabric_item.item_name as fabric_item_name,
 				sle.actual_qty, sle.stock_uom as uom,
-				ste.work_order, ste.coating_order,
+				ste.purpose, ste.work_order, ste.coating_order,
 				ste.print_order as ste_print_order, ste.pretreatment_order as ste_pretreatment_order,
 				dni.print_order as dni_print_order, dni.pretreatment_order as dni_pretreatment_order,
 				psi.print_order as psi_print_order, psi.pretreatment_order as psi_pretreatment_order
@@ -139,8 +139,6 @@ class FabricLedger:
 
 	def prepare_rows(self):
 		self.rows = []
-		if not self.data:
-			return
 
 		# Preprocess Data
 		for sle in self.data:
@@ -152,7 +150,7 @@ class FabricLedger:
 
 			sle.document_type = sle.voucher_type
 			sle.document_no = sle.voucher_no
-			if sle.ste_print_order and self.filters.merge_print_production_entries:
+			if sle.ste_print_order and self.filters.merge_print_production_entries and sle.purpose == "Manufacture":
 				sle.document_type = "Print Order"
 				sle.document_no = sle.ste_print_order
 
@@ -202,6 +200,7 @@ class FabricLedger:
 			self.rows.append(self.get_opening_row())
 
 		# Movement Rows
+		movement_rows = []
 		for voucher_dict in voucher_map.values():
 			for row in voucher_dict.fabric_items.values():
 				row.is_internal_entry = not flt(voucher_dict.actual_qty, 6) or not flt(row.actual_qty, 6)
@@ -211,7 +210,7 @@ class FabricLedger:
 					row.out_qty -= row.rejected_qty
 
 				if not row.is_internal_entry or not self.filters.hide_internal_entries:
-					self.rows.append(row)
+					movement_rows.append(row)
 
 				if row.rejected_qty:
 					rejected_row = row.copy()
@@ -220,7 +219,43 @@ class FabricLedger:
 					rejected_row.actual_qty = -rejected_row.rejected_qty
 					rejected_row.qty_after_transaction = rejected_row.actual_qty
 					rejected_row.is_internal_entry = False
-					self.rows.append(rejected_row)
+					rejected_row.is_wastage = True
+					movement_rows.append(rejected_row)
+
+		# Entry Type
+		for row in movement_rows:
+			if row.is_wastage:
+				row.entry_type = "Wastage"
+			elif row.purpose:
+				if row.purpose == "Manufacture":
+					if row.print_order:
+						row.entry_type = "Printing"
+					elif row.pretreatment_order:
+						row.entry_type = "Pretreatment"
+					elif row.coating_order:
+						row.entry_type = "Coating"
+					else:
+						row.entry_type = "Production"
+				elif row.purpose == "Material Receipt":
+					row.entry_type = "Fabric Receipt"
+				elif row.purpose == "Material Transfer for Manufacture":
+					row.entry_type = "Transfer to Production"
+				elif row.purpose == "Material Issue":
+					row.entry_type = "Reconciliation"
+				else:
+					row.entry_type = row.purpose
+			elif row.voucher_type == "Delivery Note":
+				row.entry_type = "Delivery"
+			elif row.voucher_type == "Packing Slip":
+				row.entry_type = "Packing"
+			elif row.voucher_type == "Stock Reconciliation":
+				row.entry_type = "Reconciliation"
+			elif row.voucher_type == "Purchase Receipt":
+				row.entry_type = "Purchase"
+			else:
+				row.entry_type = row.voucher_type
+
+		self.rows += movement_rows
 
 		# Running balance qty and totals
 		accumulated_balance_qty = 0
@@ -244,7 +279,7 @@ class FabricLedger:
 	def get_opening_row(self):
 		return frappe._dict({
 			"posting_date": self.filters.from_date,
-			"document_type": "Opening Stock",
+			"entry_type": "Opening Stock",
 			"fabric_item": self.filters.item_code,
 			"fabric_item_name": frappe.db.get_value("Item", self.filters.item_code, "item_name", cache=1),
 			"uom": frappe.db.get_value("Item", self.filters.item_code, "stock_uom", cache=1),
@@ -255,7 +290,7 @@ class FabricLedger:
 	def get_closing_row(self, closing_qty, in_qty, out_qty):
 		return frappe._dict({
 			"posting_date": self.filters.to_date,
-			"document_type": "Closing Stock",
+			"entry_type": "Closing Stock",
 			"fabric_item": self.filters.item_code,
 			"fabric_item_name": frappe.db.get_value("Item", self.filters.item_code, "item_name", cache=1),
 			"uom": frappe.db.get_value("Item", self.filters.item_code, "stock_uom", cache=1),
@@ -268,15 +303,16 @@ class FabricLedger:
 	def get_columns(self):
 		columns = [
 			{"label": _("Date"), "fieldname": "posting_date", "fieldtype": "Date", "width": 95},
-			{"label": _("Voucher Type"), "fieldname": "document_type", "width": 120},
-			{"label": _("Voucher #"), "fieldname": "document_no", "fieldtype": "Dynamic Link", "options": "document_type", "width": 120},
-			{"label": _("Fabric Item"), "fieldname": "fabric_item", "fieldtype": "Link", "options": "Item", "width": 100},
-			{"label": _("Fabric Name"), "fieldname": "fabric_item_name", "fieldtype": "Data", "width": 230},
+			{"label": _("Entry Type"), "fieldname": "entry_type", "fieldtype": "Data", "width": 120},
+			{"label": _("Fabric Item"), "fieldname": "fabric_item", "fieldtype": "Link", "options": "Item", "width": 100, "align": "left"},
+			{"label": _("Fabric Name"), "fieldname": "fabric_item_name", "fieldtype": "Data", "width": 220, "align": "left"},
 			{"label": _("UOM"), "fieldname": "uom", "fieldtype": "Link", "options": "UOM", "width": 60},
 			{"label": _("In Qty"), "fieldname": "in_qty", "fieldtype": "Float", "width": 80},
 			{"label": _("Out Qty"), "fieldname": "out_qty", "fieldtype": "Float", "width": 80},
 			{"label": _("Balance Qty"), "fieldname": "qty_after_transaction", "fieldtype": "Float", "width": 100},
 			{"label": _("Party"), "fieldname": "party", "fieldtype": "Dynamic Link", "options": "party_type", "width": 150},
+			{"label": _("Voucher Type"), "fieldname": "document_type", "width": 120},
+			{"label": _("Voucher #"), "fieldname": "document_no", "fieldtype": "Dynamic Link", "options": "document_type", "width": 120},
 			{"label": _("Order Type"), "fieldname": "order_type", "fieldtype": "Data", "width": 120},
 			{"label": _("Order #"), "fieldname": "order_no", "fieldtype": "Dynamic Link", "options": "order_type", "width": 120},
 			{"label": _("Batch No"), "fieldname": "batch_no", "fieldtype": "Link", "options": "Batch", "width": 150},
