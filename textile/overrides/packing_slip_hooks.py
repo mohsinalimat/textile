@@ -36,6 +36,9 @@ class PackingSlipDP(PackingSlip):
 			self.package_type = frappe.get_cached_value("Fabric Pretreatment Settings", None,
 				"default_package_type_for_ready_fabrics")
 
+		if self.package_type:
+			self.set_package_type_details()
+
 	def set_default_rejected_warehouse(self):
 		print_orders = set([d.get("print_order") for d in self.get("items") if d.get("print_order")])
 		pretreatment_orders = set([d.get("pretreatment_order") for d in self.get("items") if d.get("pretreatment_order")])
