@@ -25,6 +25,9 @@ permission_query_conditions = {
 }
 
 doc_events = {
+	"Sales Order": {
+		"autoname": "textile.overrides.sales_order_hooks.sales_order_autoname",
+	},
 	"Customer": {
 		"validate": "textile.overrides.customer_hooks.customer_order_default_validate",
 	},

@@ -82,3 +82,19 @@ def update_sales_order_mapper(mapper, target_doctype):
 
 	field_map["print_order"] = "print_order"
 	field_map["print_order_item"] = "print_order_item"
+
+
+def sales_order_autoname(doc, method):
+	print_orders = set()
+	pretreatment_orders = set()
+
+	for d in doc.get("items"):
+		if d.get("pretreatment_order"):
+			pretreatment_orders.add(d.pretreatment_order)
+		if d.get("print_order"):
+			print_orders.add(d.print_order)
+
+	if len(print_orders) == 1:
+		doc.name = list(print_orders)[0]
+	elif len(pretreatment_orders) == 1:
+		doc.name = list(pretreatment_orders)[0]
