@@ -4,6 +4,7 @@
 import frappe
 from frappe import _
 from frappe.utils import flt
+from textile.utils import get_combined_fabric_items
 
 
 def execute(filters=None):
@@ -44,27 +45,12 @@ class FabricLedger:
 		self.printed_fabric_items = []
 
 		if self.filters.item_code:
-			textile_item_type = frappe.db.get_value("Item", self.filters.item_code, "textile_item_type")
-			if textile_item_type == "Greige Fabric":
-				self.greige_fabric_items = [self.filters.item_code]
+			fabrics = get_combined_fabric_items(self.filters.item_code,
+				combine_greige_ready=self.filters.combine_greige_ready)
 
-				if self.filters.combine_ready_greige_fabric:
-					self.ready_fabric_items = frappe.get_all("Item", filters={
-						"fabric_item": self.filters.item_code, "textile_item_type": "Ready Fabric"
-					}, pluck="name")
-
-			elif textile_item_type == "Ready Fabric":
-				self.ready_fabric_items = [self.filters.item_code]
-
-				if self.filters.combine_ready_greige_fabric:
-					greige_fabric_item = frappe.db.get_value("Item", self.filters.item_code, "fabric_item")
-					if greige_fabric_item:
-						self.greige_fabric_items = [greige_fabric_item]
-
-			if self.ready_fabric_items:
-				self.printed_fabric_items = frappe.get_all("Item", filters={
-					"textile_item_type": "Printed Design", "fabric_item": ("in", self.ready_fabric_items)
-				}, pluck="name")
+			self.ready_fabric_items = fabrics.ready_fabric_items
+			self.greige_fabric_items = fabrics.greige_fabric_items
+			self.printed_fabric_items = fabrics.printed_fabric_items
 
 		elif self.filters.customer:
 			self.ready_fabric_items = frappe.get_all("Item", filters={
@@ -77,13 +63,13 @@ class FabricLedger:
 				"customer": self.filters.customer, "textile_item_type": "Printed Design"
 			}, pluck="name")
 
-		self.filters.item_codes = list(set(self.greige_fabric_items + self.ready_fabric_items + self.printed_fabric_items))
+		self.filters.fabric_item_codes = list(set(self.greige_fabric_items + self.ready_fabric_items + self.printed_fabric_items))
 
 	def get_data(self):
 		self.data = []
 		self.opening_qty = None
 
-		if not self.filters.item_codes:
+		if not self.filters.fabric_item_codes:
 			return
 
 		conditions = self.get_conditions()
@@ -92,7 +78,7 @@ class FabricLedger:
 			self.opening_qty = frappe.db.sql(f"""
 				select sum(sle.actual_qty)
 				from `tabStock Ledger Entry` sle
-				where sle.item_code in %(item_codes)s and sle.posting_date < %(from_date)s
+				where sle.item_code in %(fabric_item_codes)s and sle.posting_date < %(from_date)s
 			""", self.filters)
 			self.opening_qty = flt(self.opening_qty[0][0]) if self.opening_qty else 0
 
@@ -115,7 +101,7 @@ class FabricLedger:
 			left join `tabStock Entry` ste on ste.name = sle.voucher_no and sle.voucher_type = 'Stock Entry'
 			left join `tabDelivery Note Item` dni on dni.name = sle.voucher_detail_no and sle.voucher_type = 'Delivery Note'
 			left join `tabPacking Slip Item` psi on psi.name = sle.voucher_detail_no and sle.voucher_type = 'Packing Slip'
-			where sle.item_code in %(item_codes)s
+			where sle.item_code in %(fabric_item_codes)s
 				{conditions}
 			order by sle.posting_date, sle.posting_time, sle.creation
 		""", self.filters, as_dict=1)
@@ -150,7 +136,7 @@ class FabricLedger:
 
 			sle.document_type = sle.voucher_type
 			sle.document_no = sle.voucher_no
-			if sle.ste_print_order and self.filters.merge_print_production_entries and sle.purpose == "Manufacture":
+			if sle.ste_print_order and self.filters.merge_print_production and sle.purpose == "Manufacture":
 				sle.document_type = "Print Order"
 				sle.document_no = sle.ste_print_order
 

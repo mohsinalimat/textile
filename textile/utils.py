@@ -85,6 +85,39 @@ def is_internal_customer(customer, company):
 	return cint(customer_doc.represents_company == company)
 
 
+def get_combined_fabric_items(fabric_item, combine_greige_ready=True, combine_ready_printed=True):
+	out = frappe._dict({
+		"textile_item_type": frappe.db.get_value("Item", fabric_item, "textile_item_type", cache=1),
+		"greige_fabric_items": [],
+		"ready_fabric_items": [],
+		"printed_fabric_items": [],
+	})
+
+	if out.textile_item_type == "Greige Fabric":
+		out.greige_fabric_items = [fabric_item]
+
+		if combine_greige_ready:
+			out.ready_fabric_items = frappe.get_all("Item", filters={
+				"fabric_item": fabric_item, "textile_item_type": "Ready Fabric"
+			}, pluck="name")
+
+	elif out.textile_item_type == "Ready Fabric":
+		out.ready_fabric_items = [fabric_item]
+
+		if combine_greige_ready:
+			out.greige_fabric_item = frappe.db.get_value("Item", fabric_item, "fabric_item", cache=1)
+			if out.greige_fabric_item:
+				out.greige_fabric_items = [out.greige_fabric_item]
+
+	if out.ready_fabric_items and combine_ready_printed:
+		out.printed_fabric_items = frappe.get_all("Item", filters={
+			"textile_item_type": "Printed Design", "fabric_item": ("in", out.ready_fabric_items)
+		}, pluck="name")
+
+	out.fabric_item_codes = list(set(out.greige_fabric_items + out.ready_fabric_items + out.printed_fabric_items))
+	return out
+
+
 def get_yard_to_meter():
 	return get_textile_conversion_factors()["yard_to_meter"]
 

@@ -14,6 +14,9 @@ app_include_css = "textile.bundle.css"
 after_install = "textile.install.after_install"
 notification_config = "textile.notifications.get_notification_config"
 
+boot_session = "textile.boot.boot_session"
+set_sle_item_conditions = "textile.boot.set_sle_item_conditions"
+
 has_permission = {
 	"Work Order": "textile.overrides.work_order_hooks.work_order_has_permission",
 	"Stock Entry": "textile.overrides.stock_entry_hooks.stock_entry_has_permission",

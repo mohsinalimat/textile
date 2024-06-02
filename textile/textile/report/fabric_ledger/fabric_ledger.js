@@ -95,14 +95,14 @@ frappe.query_reports["Fabric Ledger"] = {
 			"default": 1,
 		},
 		{
-			"fieldname": "merge_print_production_entries",
+			"fieldname": "merge_print_production",
 			"label": __("Merge Print Production Entries"),
 			"fieldtype": "Check",
 			"default": 1,
 		},
 		{
-			"fieldname": "combine_ready_greige_fabric",
-			"label": __("Combine Ready and Greige Fabric"),
+			"fieldname": "combine_greige_ready",
+			"label": __("Combine Greige and Ready Fabric"),
 			"fieldtype": "Check",
 			"default": 1,
 		},
