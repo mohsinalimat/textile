@@ -94,7 +94,11 @@ def sales_order_autoname(doc, method):
 		if d.get("print_order"):
 			print_orders.add(d.print_order)
 
+	name = None
 	if len(print_orders) == 1:
-		doc.name = list(print_orders)[0]
+		name = list(print_orders)[0]
 	elif len(pretreatment_orders) == 1:
-		doc.name = list(pretreatment_orders)[0]
+		name = list(pretreatment_orders)[0]
+
+	if name and not frappe.db.exists("Sales Order", name):
+		doc.name = name
