@@ -131,12 +131,12 @@ class StockEntryDP(StockEntry):
 
 			# Add fabric item
 			items_dict = {
-				coating_order_doc.fabric_item: {
+				coating_order_doc.fabric_item: frappe._dict({
 					'item_code': coating_order_doc.fabric_item,
 					'from_warehouse': coating_order_doc.fabric_warehouse,
 					'uom': coating_order_doc.stock_uom,
 					'qty': qty,
-				}, **items_dict
+				}), **items_dict
 			}
 
 		else:
