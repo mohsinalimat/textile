@@ -231,7 +231,7 @@ fixtures = [
 				'Item Source-textile_item_type',
 				'Brand-textile_item_type',
 
-				'Quotation-textile_item_type',
+				'Quotation Item-textile_item_type',
 
 				'Sales Order Item-fabric_item',
 				'Sales Order Item-fabric_item_name',
