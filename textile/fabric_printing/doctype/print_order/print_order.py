@@ -1202,11 +1202,13 @@ def create_design_items_and_boms(print_order):
 	if all(d.item_code and d.design_bom for d in doc.items):
 		frappe.throw(_("Printed Design Items and BOMs already created."))
 
+	ignore_permissions = frappe.has_permission("Print Order", "write")
+
 	if len(doc.items) > 5:
-		doc.queue_action("_create_design_items_and_boms", timeout=600)
+		doc.queue_action("_create_design_items_and_boms", timeout=600, ignore_permissions=ignore_permissions)
 		frappe.msgprint(_("Creating Design Items and BOMs..."), alert=True)
 	else:
-		doc._create_design_items_and_boms(ignore_permissions=frappe.has_permission("Print Order", "write"))
+		doc._create_design_items_and_boms(ignore_permissions=ignore_permissions)
 
 
 @frappe.whitelist()
