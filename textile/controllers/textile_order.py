@@ -180,3 +180,44 @@ class TextileOrder(StatusUpdaterERP):
 			frappe.throw(_("Could not create BOM because {0} does not have a Default BOM").format(
 				frappe.get_desk_link("Item", item_code)
 			))
+
+	def get_production_progress_data(self, reference_fieldname, total_qty, uom):
+		totals = frappe.db.sql(f"""
+			select
+				sum(qty) as qty,
+				sum(producible_qty) as producible_qty,
+				sum(material_transferred_for_manufacturing) as material_transferred_for_manufacturing,
+				sum(produced_qty) as produced_qty,
+				sum(subcontract_order_qty) as subcontract_order_qty,
+				sum(subcontract_received_qty) as subcontract_received_qty
+			from `tabWork Order`
+			where `{reference_fieldname}` = %s and docstatus = 1
+		""", self.name, as_dict=1)
+
+		totals = totals[0] if totals else frappe._dict()
+		progress_data = frappe._dict({
+			"qty": flt(totals.qty) or flt(total_qty),
+			"stock_uom": cstr(uom),
+			"producible_qty": flt(totals.producible_qty),
+			"material_transferred_for_manufacturing": flt(totals.material_transferred_for_manufacturing),
+			"produced_qty": flt(totals.produced_qty),
+			"subcontract_order_qty": flt(totals.subcontract_order_qty),
+			"subcontract_received_qty": flt(totals.subcontract_received_qty),
+			"operations": []
+		})
+
+		operations_data = frappe.db.sql(f"""
+			select
+				woo.operation,
+				sum(woo.completed_qty) as completed_qty
+			from `tabWork Order Operation` woo
+			inner join `tabWork Order` wo on wo.name = woo.parent
+			where wo.`{reference_fieldname}` = %s and wo.docstatus = 1
+			group by woo.operation
+			order by woo.idx
+		""", self.name, as_dict=1)
+
+		for row in operations_data:
+			progress_data["operations"].append(row)
+
+		return progress_data

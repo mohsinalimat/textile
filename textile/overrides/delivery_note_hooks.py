@@ -73,6 +73,8 @@ class DeliveryNoteDP(DeliveryNote):
 		if is_return_fabric and is_customer_provided:
 			return True
 
+		return super().get_skip_sales_invoice(row)
+
 
 def override_delivery_note_dashboard(data):
 	from textile.utils import override_sales_transaction_dashboard

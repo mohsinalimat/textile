@@ -39,7 +39,7 @@ class PretreatmentOrder(TextileOrder):
 			self.calculate_totals()
 		elif self.docstatus == 1:
 			self.set_work_order_onload()
-			self.set_progress_data_onload()
+			self.set_production_progress_data_onload()
 			self.set_onload('disallow_on_submit', self.get_disallow_on_submit_fields())
 
 	def validate(self):
@@ -89,44 +89,9 @@ class PretreatmentOrder(TextileOrder):
 		)
 		self.set_onload("work_order", work_order)
 
-	def set_progress_data_onload(self):
-		totals = frappe.db.sql("""
-			select
-				sum(qty) as qty,
-				sum(producible_qty) as producible_qty,
-				sum(material_transferred_for_manufacturing) as material_transferred_for_manufacturing,
-				sum(produced_qty) as produced_qty,
-				sum(subcontract_order_qty) as subcontract_order_qty,
-				sum(subcontract_received_qty) as subcontract_received_qty
-			from `tabWork Order`
-			where pretreatment_order = %s and docstatus = 1
-		""", self.name, as_dict=1)
-
-		totals = totals[0] if totals else frappe._dict()
-		progress_data = {
-			"qty": flt(totals.qty) or flt(self.stock_qty),
-			"stock_uom": self.stock_uom,
-			"producible_qty": flt(totals.producible_qty),
-			"material_transferred_for_manufacturing": flt(totals.material_transferred_for_manufacturing),
-			"produced_qty": flt(totals.produced_qty),
-			"subcontract_order_qty": flt(totals.subcontract_order_qty),
-			"subcontract_received_qty": flt(totals.subcontract_received_qty),
-			"operations": []
-		}
-
-		operations_data = frappe.db.sql("""
-			select
-				woo.operation,
-				sum(woo.completed_qty) as completed_qty
-			from `tabWork Order Operation` woo
-			inner join `tabWork Order` wo on wo.name = woo.parent
-			where wo.pretreatment_order = %s and wo.docstatus = 1
-			group by woo.operation
-			order by woo.idx
-		""", self.name, as_dict=1)
-
-		for row in operations_data:
-			progress_data["operations"].append(row)
+	def set_production_progress_data_onload(self):
+		progress_data = self.get_production_progress_data("pretreatment_order",
+			self.stock_qty, self.stock_uom)
 
 		self.set_onload("progress_data", progress_data)
 

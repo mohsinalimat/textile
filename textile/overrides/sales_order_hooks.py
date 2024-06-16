@@ -60,11 +60,15 @@ class SalesOrderDP(SalesOrder):
 		if row.get('print_order_item'):
 			return frappe.db.get_value("Print Order Item", row.print_order_item, "design_bom", cache=1)
 
+		return super().get_sales_order_item_bom(row)
+
 	def get_skip_delivery_note(self, row):
 		if row.get("pretreatment_order"):
 			delivery_required = frappe.db.get_value("Pretreatment Order", row.pretreatment_order, "delivery_required", cache=1)
 			if not delivery_required:
 				return True
+
+		return super().get_skip_delivery_note(row)
 
 
 def override_sales_order_dashboard(data):

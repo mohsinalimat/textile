@@ -10,7 +10,7 @@ from textile.utils import is_row_return_fabric
 class PackingSlipDP(PackingSlip):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.force_item_fields += ["fabric_item", "fabric_item_name"]
+		self.force_item_fields += ["fabric_item", "fabric_item_name", "textile_item_type"]
 
 	def set_missing_values(self, for_validate=False):
 		super().set_missing_values(for_validate=for_validate)

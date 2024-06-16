@@ -145,7 +145,7 @@ def override_sales_transaction_dashboard(data):
 
 	textile_items = ["Pretreatment Order", "Print Order"]
 
-	ref_section = [d for d in data["transactions"] if d["label"] == _("Reference")]
+	ref_section = [d for d in data["transactions"] if d["label"] == _("Textile")]
 	if ref_section:
 		ref_section = ref_section[0]
 		ref_section["items"] = textile_items + ref_section["items"]
