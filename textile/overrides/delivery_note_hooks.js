@@ -3,22 +3,26 @@ frappe.provide("textile");
 frappe.ui.form.on("Delivery Note", {
 	refresh: function(frm) {
 		if (frm.doc.docstatus === 0) {
-			frm.add_custom_button(__('Pretreatment Order'), function() {
-				textile.get_items_from_pretreatment_order(
-					frm,
-					"textile.fabric_pretreatment.doctype.pretreatment_order.pretreatment_order.make_delivery_note",
-					null,
-					"textile.fabric_pretreatment.doctype.pretreatment_order.pretreatment_order.get_pretreatment_orders_to_be_delivered"
-				);
-			}, __("Get Items From"));
+			if (frappe.model.can_read("Pretreatment Order") || frappe.model.can_select("Pretreatment Order")) {
+				frm.add_custom_button(__('Pretreatment Order'), function () {
+					textile.get_items_from_pretreatment_order(
+						frm,
+						"textile.fabric_pretreatment.doctype.pretreatment_order.pretreatment_order.make_delivery_note",
+						null,
+						"textile.fabric_pretreatment.doctype.pretreatment_order.pretreatment_order.get_pretreatment_orders_to_be_delivered"
+					);
+				}, __("Get Items From"));
+			}
 
-			frm.add_custom_button(__('Print Order'), function() {
-				textile.get_items_from_print_order(frm,
-					"textile.fabric_printing.doctype.print_order.print_order.make_delivery_note",
-					null,
-					"textile.fabric_printing.doctype.print_order.print_order.get_print_orders_to_be_delivered"
-				);
-			}, __("Get Items From"));
+			if (frappe.model.can_read("Print Order") || frappe.model.can_select("Print Order")) {
+				frm.add_custom_button(__('Print Order'), function () {
+					textile.get_items_from_print_order(frm,
+						"textile.fabric_printing.doctype.print_order.print_order.make_delivery_note",
+						null,
+						"textile.fabric_printing.doctype.print_order.print_order.get_print_orders_to_be_delivered"
+					);
+				}, __("Get Items From"));
+			}
 		}
 	},
 });

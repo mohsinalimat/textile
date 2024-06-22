@@ -1588,7 +1588,8 @@ def get_print_orders_to_be_delivered(doctype, txt, searchfield, start, page_len,
 def _get_print_orders_to_be_delivered(doctype="Print Order", txt="", searchfield="name", start=0, page_len=0,
 		filters=None, as_dict=True, ignore_permissions=False):
 
-	fields = get_fields("Print Order")
+	fields = get_fields("Print Order",
+		['transaction_date', 'customer', 'customer_name', 'fabric_item', 'fabric_item_name'])
 	select_fields = ", ".join(["`tabPrint Order`.{0}".format(f) for f in fields])
 	limit = "limit {0}, {1}".format(start, page_len) if page_len else ""
 
@@ -1626,7 +1627,8 @@ def get_print_orders_to_be_billed(doctype, txt, searchfield, start, page_len, fi
 
 def _get_print_orders_to_be_billed(doctype="Print Order", txt="", searchfield="name", start=0, page_len=0,
 		filters=None, as_dict=True, ignore_permissions=False):
-	fields = get_fields("Print Order")
+	fields = get_fields("Print Order",
+		['transaction_date', 'customer', 'customer_name', 'fabric_item', 'fabric_item_name'])
 	select_fields = ", ".join(["`tabPrint Order`.{0}".format(f) for f in fields])
 	limit = "limit {0}, {1}".format(start, page_len) if page_len else ""
 

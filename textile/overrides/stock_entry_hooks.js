@@ -1,9 +1,11 @@
 frappe.ui.form.on('Stock Entry', {
 	refresh: function(frm) {
 		if (frm.doc.docstatus === 0) {
-			frm.add_custom_button(__('Print Order Fabrics'), function() {
-				frm.events.get_items_from_print_order(frm);
-			}, __("Get Items From"));
+			if (frappe.model.can_read("Print Order") || frappe.model.can_select("Print Order")) {
+				frm.add_custom_button(__('Print Order Fabrics'), function () {
+					frm.events.get_items_from_print_order(frm);
+				}, __("Get Items From"));
+			}
 		}
 	},
 
