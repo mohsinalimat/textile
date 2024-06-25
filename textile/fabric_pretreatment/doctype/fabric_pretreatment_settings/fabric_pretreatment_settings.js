@@ -14,5 +14,27 @@ frappe.ui.form.on('Fabric Pretreatment Settings', {
 				}
 			};
 		});
+
+		frm.set_query("stock_entry_type_for_fabric_transfer", function(doc) {
+			return {
+				filters: {
+					purpose: "Material Transfer for Manufacture",
+				}
+			};
+		});
+		frm.set_query("stock_entry_type_for_pretreatment_prodution", function(doc) {
+			return {
+				filters: {
+					purpose: "Manufacture",
+				}
+			};
+		});
+		frm.set_query("stock_entry_type_for_operation_consumption", function(doc) {
+			return {
+				filters: {
+					purpose: "Material Consumption for Manufacture",
+				}
+			};
+		});
 	}
 });

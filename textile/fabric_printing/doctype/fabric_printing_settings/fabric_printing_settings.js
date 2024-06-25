@@ -14,5 +14,27 @@ frappe.ui.form.on('Fabric Printing Settings', {
 				}
 			};
 		});
+
+		frm.set_query("stock_entry_type_for_fabric_transfer", function(doc) {
+			return {
+				filters: {
+					purpose: "Material Transfer for Manufacture",
+				}
+			};
+		});
+		frm.set_query("stock_entry_type_for_print_production", function(doc) {
+			return {
+				filters: {
+					purpose: "Manufacture",
+				}
+			};
+		});
+		frm.set_query("stock_entry_type_for_fabric_coating", function(doc) {
+			return {
+				filters: {
+					purpose: "Manufacture",
+				}
+			};
+		});
 	}
 });
