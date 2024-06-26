@@ -2,7 +2,9 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-let group_field_opts = [
+frappe.provide("textile");
+
+textile.group_field_opts_fdr = [
 	"",
 	"Group by Customer",
 	"Group by Customer Group",
@@ -159,14 +161,14 @@ frappe.query_reports["Fabric Delivery Register"] = {
 			fieldname: "group_by_1",
 			label: __("Group By Level 1"),
 			fieldtype: "Select",
-			options: group_field_opts,
+			options: textile.group_field_opts_fdr,
 			default: ""
 		},
 		{
 			fieldname: "group_by_2",
 			label: __("Group By Level 2"),
 			fieldtype: "Select",
-			options: group_field_opts,
+			options: textile.group_field_opts_fdr,
 			default: "Group by Fabric Item"
 		},
 		{

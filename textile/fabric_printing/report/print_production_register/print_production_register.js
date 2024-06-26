@@ -2,8 +2,9 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
+frappe.provide("textile");
 
-let group_field_opts = [
+textile.group_field_opts_printpr = [
 	"",
 	"Group by Customer",
 	"Group by Fabric Item",
@@ -129,21 +130,21 @@ frappe.query_reports["Print Production Register"] = {
 			fieldname: "group_by_1",
 			label: __("Group By Level 1"),
 			fieldtype: "Select",
-			options: group_field_opts,
+			options: textile.group_field_opts_printpr,
 			default: "Group by Process Item"
 		},
 		{
 			fieldname: "group_by_2",
 			label: __("Group By Level 2"),
 			fieldtype: "Select",
-			options: group_field_opts,
+			options: textile.group_field_opts_printpr,
 			default: "Group by Fabric Printer"
 		},
 		{
 			fieldname: "group_by_3",
 			label: __("Group By Level 3"),
 			fieldtype: "Select",
-			options: group_field_opts,
+			options: textile.group_field_opts_printpr,
 			default: ""
 		},
 		{
