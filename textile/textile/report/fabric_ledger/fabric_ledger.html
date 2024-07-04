@@ -59,14 +59,14 @@
 				</h5>
 			{% endif %}
 
-			{% if filters.item_code %}
+			{% if filters.item_code && !filters.customer %}
 				<h5>
 					<strong>{%= __("Fabric Code") %}:</strong>
 					{%= filters.item_code %}
 				</h5>
 			{% endif %}
 
-			{% if filters.item_name %}
+			{% if filters.item_name && !filters.customer %}
 				<h5>
 					<strong>{%= __("Fabric Name") %}:</strong>
 					{%= filters.item_name %}
@@ -81,8 +81,8 @@
 	<thead>
 		<tr>
 			<th class="field-label date" style="width: 8%;">{%= __("Date") %}</th>
-			<th class="field-label" style="width: 10%;">{%= __("Voucher Type") %}</th>
-			<th class="field-label" style="width: 10%;">{%= __("Voucher") %}</th>
+			<th class="field-label" style="width: 11%;">{%= __("Voucher Type") %}</th>
+			<th class="field-label" style="width: 11%;">{%= __("Voucher") %}</th>
 			{% if filters.customer %}
 				<th class="field-label" style="width: 10%;">{%= __("Fabric Code") %}</th>
 				<th class="field-label">{%= __("Fabric Name") %}</th>
