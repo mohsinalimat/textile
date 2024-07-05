@@ -92,6 +92,7 @@ def update_work_order_on_create(work_order, args=None):
 		work_order.packing_slip_required = cint(
 			pretreatment_order_details.delivery_required and pretreatment_order_details.packing_slip_required
 		)
+		work_order.produce_fg_in_wip_warehouse = 0
 
 		for warehouse_field in warehouse_fields:
 			warehouse = pretreatment_order_details.get(warehouse_field)
@@ -110,6 +111,7 @@ def update_work_order_on_create(work_order, args=None):
 		work_order.packing_slip_required = cint(
 			not print_order_details.is_internal_customer and print_order_details.packing_slip_required
 		)
+		work_order.produce_fg_in_wip_warehouse = work_order.packing_slip_required
 
 		for warehouse_field in warehouse_fields:
 			warehouse = print_order_details.get(warehouse_field)
