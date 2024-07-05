@@ -35,7 +35,8 @@
 
 <div>
 	<h2 class="mt-0">{%= __("Fabric Ledger") %}</h2>
-	<hr style="margin-block: 8px !important;">
+
+	<hr style="margin-block: 10px !important;">
 
 	<!-- Header -->
 	<div class="clearfix">
@@ -59,62 +60,75 @@
 				</h5>
 			{% endif %}
 
-			{% if filters.item_code && !filters.customer %}
+			{% if filters.item_name %}
 				<h5>
-					<strong>{%= __("Fabric Code") %}:</strong>
-					{%= filters.item_code %}
-				</h5>
-			{% endif %}
-
-			{% if filters.item_name && !filters.customer %}
-				<h5>
-					<strong>{%= __("Fabric Name") %}:</strong>
+					<strong>{%= __("Fabric") %}:</strong>
 					{%= filters.item_name %}
 				</h5>
 			{% endif %}
 		</div>
 	</div>
+
+	<hr style="margin-top: 8px !important; margin-bottom: 0 !important;">
 </div>
 
 <!-- Items Table -->
 <table class="table table-bordered w-100">
 	<thead>
 		<tr>
-			<th class="field-label date" style="width: 8%;">{%= __("Date") %}</th>
-			<th class="field-label" style="width: 11%;">{%= __("Voucher Type") %}</th>
-			<th class="field-label" style="width: 11%;">{%= __("Voucher") %}</th>
-			{% if filters.customer %}
-				<th class="field-label" style="width: 10%;">{%= __("Fabric Code") %}</th>
-				<th class="field-label">{%= __("Fabric Name") %}</th>
-			{% endif %}
+			<th class="field-label text-nowrap" style="width: 11%;">{%= __("Date") %}</th>
+
+			<th class="field-label text-nowrap" style="width: 15%">{%= __("Voucher") %}</th>
+
+			<th class="field-label">{%= __("Fabric") %}</th>
 
 			{% if !filters.customer %}
-				<th class="field-label" style="width: 12%;">{%= __("Customer") %}</th>
+				<th class="field-label">{%= __("Customer") %}</th>
 			{% endif %}
-			<th class="field-label text-right" style="width: 7%;">{%= __("In Qty") %}</th>
-			<th class="field-label text-right" style="width: 7%;">{%= __("Out Qty") %}</th>
-			<th class="field-label text-right" style="width: 10%;">{%= __("Balance Qty") %}</th>
+
+			<th class="field-label" style="width: 7%;">{%= __("UOM") %}</th>
+
+			<th class="field-label text-right text-nowrap" style="width: 7%;">{%= __("In") %}</th>
+
+			<th class="field-label text-right text-nowrap" style="width: 7%;">{%= __("Out") %}</th>
+
+			<th class="field-label text-right text-nowrap" style="width: 10%;">{%= __("Balance") %}</th>
 		</tr>
 	</thead>
 
 	<tbody>
 		{% for (let d of data) { %}
 			<tr>
-				<td class="field-value">{%= d.posting_date ? frappe.datetime.str_to_user(d.posting_date) : "" %}</td>
-				<td class="field-value">{%= d.entry_type %}</td>
-				<td class="field-value">{%= d.document_no %}</td>
-				{% if filters.customer %}
-					<td class="field-value">{%= d.fabric_item %}</td>
-					<td class="field-value">{%= d.fabric_item_name %}</td>
-				{% endif %}
+				<td class="field-value text-nowrap">
+					{%= d.posting_date ? frappe.datetime.str_to_user(d.posting_date) : "" %}
+				</td>
+
+				<td class="field-value text-nowrap">
+					<div>{%= d.entry_type %}</div>
+					<div>{%= d.document_no %}</div>
+				</td>
+
+				<td class="field-value">{%= d.fabric_item_name %}</td>
 
 				{% if !filters.customer %}
-					<td class="field-value">{%= d.party %}</td>
+					<td class="field-value">{%= d.party_name %}</td>
 				{% endif %}
-				<td class="field-value text-right">{%= d.in_qty ? format_number(d.in_qty, null, 2) : ""%}</td>
-				<td class="field-value text-right">{%= d.out_qty ? format_number(d.out_qty, null, 2) : "" %}</td>
-				<td class="field-value text-right">{%= d.qty_after_transaction ? format_number(d.qty_after_transaction, null, 2) : 0 %}</td>
+
+				<td class="field-value">{%= d.uom %}</td>
+
+				<td class="field-value text-right text-nowrap">
+					{%= d.in_qty ? format_number(d.in_qty, null, 2) : "" %}
+				</td>
+
+				<td class="field-value text-right text-nowrap">
+					{%= d.out_qty ? format_number(d.out_qty, null, 2) : "" %}
+				</td>
+
+				<td class="field-value text-right text-nowrap">
+					{%= d.qty_after_transaction != null ? format_number(d.qty_after_transaction, null, 2) : "" %}
+				</td>
 			</tr>
 		{% } %}
 	</tbody>
 </table>
+<p class="text-right text-muted">Printed On {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}</p>

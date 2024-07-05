@@ -58,7 +58,8 @@ frappe.query_reports["Fabric Ledger"] = {
 				if (!item_code) {
 					frappe.query_report.set_filter_value('item_name', "");
 				} else {
-					frappe.db.get_value("Item", item_code, 'item_name', function(value) {
+					frappe.db.get_value("Item", item_code, ['item_name', 'customer'], function(value) {
+						frappe.query_report.set_filter_value('customer', value['customer']);
 						frappe.query_report.set_filter_value('item_name', value['item_name']);
 					});
 				}
@@ -105,6 +106,13 @@ frappe.query_reports["Fabric Ledger"] = {
 			"label": __("Combine Greige and Ready Fabric"),
 			"fieldtype": "Check",
 			"default": 1,
+		},
+		{
+			"fieldname": "orientation",
+			"label": __("Orientation"),
+			"fieldtype": "Data",
+			"default": "Portrait",
+			"hidden": 1,
 		},
 	],
 	formatter: function(value, row, column, data, default_formatter) {
