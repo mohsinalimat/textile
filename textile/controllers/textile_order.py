@@ -188,6 +188,7 @@ class TextileOrder(StatusUpdaterERP):
 				sum(producible_qty) as producible_qty,
 				sum(material_transferred_for_manufacturing) as material_transferred_for_manufacturing,
 				sum(produced_qty) as produced_qty,
+				sum(process_loss_qty) as process_loss_qty,
 				sum(subcontract_order_qty) as subcontract_order_qty,
 				sum(subcontract_received_qty) as subcontract_received_qty
 			from `tabWork Order`
@@ -201,6 +202,7 @@ class TextileOrder(StatusUpdaterERP):
 			"producible_qty": flt(totals.producible_qty),
 			"material_transferred_for_manufacturing": flt(totals.material_transferred_for_manufacturing),
 			"produced_qty": flt(totals.produced_qty),
+			"process_loss_qty": flt(totals.process_loss_qty),
 			"subcontract_order_qty": flt(totals.subcontract_order_qty),
 			"subcontract_received_qty": flt(totals.subcontract_received_qty),
 			"operations": []

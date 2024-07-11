@@ -110,7 +110,7 @@ class StockEntryDP(StockEntry):
 				self.fabric_printer, work_order_process, frappe.get_desk_link("Work Order", self.work_order)
 			))
 
-	def get_bom_raw_materials(self, qty, scrap_qty=0):
+	def get_bom_raw_materials(self, qty, process_loss_qty=0):
 		from textile.utils import gsm_to_grams
 
 		if self.coating_order:
@@ -125,7 +125,7 @@ class StockEntryDP(StockEntry):
 
 			# Add raw materials
 			coating_item_qty = qty * cf_coating
-			items_dict = super().get_bom_raw_materials(coating_item_qty, scrap_qty)
+			items_dict = super().get_bom_raw_materials(coating_item_qty, process_loss_qty)
 			for d in items_dict.values():
 				d.from_warehouse = coating_order_doc.source_warehouse
 
@@ -140,7 +140,7 @@ class StockEntryDP(StockEntry):
 			}
 
 		else:
-			items_dict = super().get_bom_raw_materials(qty, scrap_qty)
+			items_dict = super().get_bom_raw_materials(qty, process_loss_qty)
 
 		return items_dict
 

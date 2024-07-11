@@ -489,7 +489,7 @@ class PretreatmentOrder(TextileOrder):
 		out.material_transferred_for_manufacturing = 0
 		out.produced_qty = 0
 		out.completed_qty = 0
-		out.scrap_qty = 0
+		out.process_loss_qty = 0
 		out.packed_qty = 0
 		out.subcontractable_qty = 0
 		out.has_work_order_to_pack = False
@@ -499,7 +499,7 @@ class PretreatmentOrder(TextileOrder):
 			# Work Order
 			work_order_data = frappe.db.sql("""
 				SELECT qty, producible_qty,
-					produced_qty, material_transferred_for_manufacturing, completed_qty, scrap_qty,
+					produced_qty, material_transferred_for_manufacturing, completed_qty, process_loss_qty,
 					production_status, packing_status, subcontracting_status
 				FROM `tabWork Order`
 				WHERE docstatus = 1 AND pretreatment_order = %s
@@ -511,13 +511,13 @@ class PretreatmentOrder(TextileOrder):
 				out.material_transferred_for_manufacturing += flt(d.material_transferred_for_manufacturing)
 				out.produced_qty += flt(d.produced_qty)
 				out.completed_qty += flt(d.completed_qty)
-				out.scrap_qty += flt(d.scrap_qty)
+				out.process_loss_qty += flt(d.process_loss_qty)
 
 				out.subcontractable_qty += max(get_subcontractable_qty(
 					d.producible_qty,
 					d.material_transferred_for_manufacturing,
 					d.produced_qty,
-					d.scrap_qty
+					d.process_loss_qty
 				), 0)
 
 				if d.production_status == "To Produce" or d.subcontracting_status == "To Receive":
