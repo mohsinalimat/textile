@@ -105,6 +105,9 @@ def make_rotated_image(file):
 	original_image, original_filename, ext = get_local_image(file)
 	image_format = original_image.format
 
+	if original_image.mode in ("RGBA", "CMYK"):
+		original_image = original_image.convert("RGB")
+
 	scaling_factor = view_height / original_image.width
 	width = original_image.height * scaling_factor
 
