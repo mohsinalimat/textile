@@ -211,6 +211,8 @@ class PrintOrder(TextileOrder):
 				self.status = "To Produce"
 			elif self.delivery_status == "To Deliver":
 				self.status = "To Deliver"
+			elif self.packing_status == "To Pack":
+				self.status = "To Close"
 			else:
 				self.status = "Completed"
 
@@ -660,24 +662,35 @@ class PrintOrder(TextileOrder):
 			d.work_order_qty = flt(data.work_order_qty_map.get(d.name))
 			d.produced_qty = flt(data.produced_qty_map.get(d.name))
 			d.packed_qty = flt(data.packed_qty_map.get(d.name))
+			d.shrinked_qty = flt(data.shrinked_qty_map.get(d.name))
 
 			if update:
 				d.db_set({
 					'work_order_qty': d.work_order_qty,
 					'produced_qty': d.produced_qty,
 					'packed_qty': d.packed_qty,
+					'shrinked_qty': d.shrinked_qty,
 				}, update_modified=update_modified)
 
 		self.per_work_ordered = flt(self.calculate_status_percentage('work_order_qty', 'stock_print_length', self.items))
 		self.per_produced = flt(self.calculate_status_percentage('produced_qty', 'stock_print_length', self.items))
 		self.per_packed = flt(self.calculate_status_percentage('packed_qty', 'stock_print_length', self.items))
+		self.per_shrinked = flt(self.calculate_status_percentage('shrinked_qty', 'stock_print_length', self.items))
 
 		production_within_allowance = self.per_work_ordered >= 100 and self.per_produced > 0 and not data.has_work_order_to_produce
 		self.production_status = self.get_completion_status('per_produced', 'Produce',
 			not_applicable=self.status == "Closed" or not self.per_work_ordered,
 			within_allowance=production_within_allowance)
 
-		packing_within_allowance = self.per_work_ordered >= 100 and self.per_packed > 0 and not data.has_work_order_to_pack
+		has_unpacked = [flt(d.produced_qty - d.packed_qty - d.shrinked_qty, d.precision("print_length")) for d in self.items]
+		has_unpacked = [q for q in has_unpacked if q > 0]
+
+		packing_within_allowance = (
+			self.per_work_ordered >= 100
+			and self.per_packed > 0
+			and not data.has_work_order_to_pack
+			and not has_unpacked
+		)
 		self.packing_status = self.get_completion_status('per_packed', 'Pack',
 			not_applicable=self.is_internal_customer or self.status == "Closed" or not self.packing_slip_required or not self.per_produced,
 			within_allowance=packing_within_allowance)
@@ -687,6 +700,7 @@ class PrintOrder(TextileOrder):
 				'per_work_ordered': self.per_work_ordered,
 				'per_produced': self.per_produced,
 				'per_packed': self.per_packed,
+				'per_shrinked': self.per_shrinked,
 
 				'production_status': self.production_status,
 				'packing_status': self.packing_status,
@@ -697,6 +711,7 @@ class PrintOrder(TextileOrder):
 		out.work_order_qty_map = {}
 		out.produced_qty_map = {}
 		out.packed_qty_map = {}
+		out.shrinked_qty_map = {}
 		out.has_work_order_to_pack = False
 		out.has_work_order_to_produce = False
 
@@ -705,7 +720,8 @@ class PrintOrder(TextileOrder):
 			if row_names:
 				# Work Order
 				work_order_data = frappe.db.sql("""
-					SELECT print_order_item, qty, completed_qty, production_status, subcontracting_status, packing_status
+					SELECT print_order_item, qty, completed_qty, packed_qty, reconciled_qty,
+						production_status, subcontracting_status, packing_status
 					FROM `tabWork Order`
 					WHERE docstatus = 1 AND print_order_item IN %s
 				""", [row_names], as_dict=1)
@@ -717,18 +733,16 @@ class PrintOrder(TextileOrder):
 					out.produced_qty_map.setdefault(d.print_order_item, 0)
 					out.produced_qty_map[d.print_order_item] += flt(d.completed_qty)
 
+					out.packed_qty_map.setdefault(d.print_order_item, 0)
+					out.packed_qty_map[d.print_order_item] += flt(d.packed_qty)
+
+					out.shrinked_qty_map.setdefault(d.print_order_item, 0)
+					out.shrinked_qty_map[d.print_order_item] += flt(d.reconciled_qty)
+
 					if d.production_status == "To Produce" or d.subcontracting_status == "To Receive":
 						out.has_work_order_to_produce = True
 					if d.packing_status != "Packed":
 						out.has_work_order_to_pack = True
-
-				# Packing Slips
-				out.packed_qty_map = dict(frappe.db.sql("""
-					select print_order_item, sum(packed_qty * conversion_factor)
-					from `tabSales Order Item`
-					where docstatus = 1 and print_order_item in %s
-					group by print_order_item
-				""", [row_names]))
 
 		return out
 
@@ -1298,7 +1312,7 @@ def make_fabric_transfer_entry(print_order, fabric_transfer_qty=None, for_submit
 	stock_entry.from_warehouse = doc.fabric_warehouse
 	stock_entry.to_warehouse = doc.wip_warehouse
 
-	row = stock_entry.append("items")
+	row = stock_entry.append("items", frappe.new_doc("Stock Entry Detail"))
 	row.item_code = doc.fabric_item
 	row.s_warehouse = stock_entry.from_warehouse
 	row.t_warehouse = stock_entry.to_warehouse
@@ -1311,17 +1325,67 @@ def make_fabric_transfer_entry(print_order, fabric_transfer_qty=None, for_submit
 	row.qty = fabric_transfer_qty
 	row.uom = "Meter"
 
+	_postprocess_stock_entry(stock_entry, doc, for_submit)
+
+	return stock_entry
+
+
+@frappe.whitelist()
+def make_fabric_shrinkage_entry(print_order, for_submit=False):
+	if isinstance(print_order, str):
+		doc = frappe.get_doc('Print Order', print_order)
+	else:
+		doc = print_order
+
+	if not all(d.item_code and d.design_bom for d in doc.items):
+		frappe.throw(_("Create Items and BOMs first"))
+
+	if not doc.packing_slip_required:
+		frappe.throw(_("Fabric Shrinkage Entry not required when Packing Slip is not required").format(doc.name))
+
+	stock_entry = frappe.new_doc("Stock Entry")
+	stock_entry.purpose = "Material Issue"
+	stock_entry.print_order = doc.name
+	stock_entry.company = doc.company
+	stock_entry.from_warehouse = doc.wip_warehouse
+
+	for d in doc.items:
+		work_orders = frappe.get_all("Work Order", filters={
+			"print_order_item": d.name, "docstatus": 1
+		}, fields=[
+			"name", "production_item",
+			"completed_qty", "packed_qty", "reconciled_qty",
+			"produce_fg_in_wip_warehouse", "wip_warehouse", "fg_warehouse"
+		])
+
+		for wo in work_orders:
+			unpacked_qty = flt(flt(wo.completed_qty) - flt(wo.packed_qty) - flt(wo.reconciled_qty),
+				stock_entry.precision("qty", "items"))
+			if unpacked_qty <= 0:
+				continue
+
+			row = stock_entry.append("items", frappe.new_doc("Stock Entry Detail"))
+			row.work_order = wo.name
+			row.item_code = wo.production_item
+			row.s_warehouse = wo.wip_warehouse if wo.produce_fg_in_wip_warehouse else wo.fg_warehouse
+			row.qty = unpacked_qty
+			row.uom = "Meter"
+
+	_postprocess_stock_entry(stock_entry, doc, for_submit)
+
+	return stock_entry
+
+
+def _postprocess_stock_entry(stock_entry, print_order, for_submit=False):
 	stock_entry.set_stock_entry_type()
 
-	if stock_entry.meta.has_field("cost_center") and doc.get("cost_center"):
-		stock_entry.cost_center = doc.get("cost_center")
+	if stock_entry.meta.has_field("cost_center") and print_order.get("cost_center"):
+		stock_entry.cost_center = print_order.get("cost_center")
 
 	if not for_submit:
 		stock_entry.run_method("set_missing_values")
 		stock_entry.run_method("set_actual_qty")
 		stock_entry.run_method("calculate_rate_and_amount", raise_error_if_no_rate=False)
-
-	return stock_entry
 
 
 @frappe.whitelist()

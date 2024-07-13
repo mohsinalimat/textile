@@ -18,11 +18,13 @@ class StockEntryDP(StockEntry):
 	def on_submit(self):
 		super().on_submit()
 		self.update_print_order_fabric_transfer_status()
+		self.update_print_order_shrinkage_status()
 		self.update_coating_order(validate_coating_order_qty=True)
 
 	def on_cancel(self):
 		super().on_cancel()
 		self.update_print_order_fabric_transfer_status()
+		self.update_print_order_shrinkage_status()
 		self.update_coating_order()
 
 	def set_stock_entry_type(self):
@@ -35,6 +37,8 @@ class StockEntryDP(StockEntry):
 				ste_type = printing_settings.stock_entry_type_for_print_production
 			elif self.purpose == "Material Transfer for Manufacture":
 				ste_type = printing_settings.stock_entry_type_for_fabric_transfer
+			elif self.purpose == "Material Issue":
+				ste_type = printing_settings.stock_entry_type_for_fabric_shrinkage
 
 		elif self.get("coating_order"):
 			if self.purpose == "Manufacture":
@@ -64,6 +68,26 @@ class StockEntryDP(StockEntry):
 		if not frappe.flags.skip_print_order_status_update:
 			print_order = frappe.get_doc("Print Order", self.print_order)
 			print_order.set_fabric_transfer_status(update=True)
+			print_order.notify_update()
+
+	def update_print_order_shrinkage_status(self):
+		if self.purpose != "Material Issue":
+			return
+
+		work_orders = list(set([d.work_order for d in self.items if d.get("work_order")]))
+		if not work_orders:
+			return
+
+		print_orders = frappe.db.sql_list("""
+			select distinct print_order
+			from `tabWork Order`
+			where name in %s and docstatus = 1 and ifnull(print_order, '') != ''
+		""", [work_orders])
+
+		for name in print_orders:
+			print_order = frappe.get_doc("Print Order", name)
+			print_order.set_production_packing_status(update=True)
+			print_order.set_status(update=True)
 			print_order.notify_update()
 
 	def update_coating_order(self, validate_coating_order_qty=False):
