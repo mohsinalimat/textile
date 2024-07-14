@@ -26,9 +26,7 @@ frappe.ui.form.on('Item', {
 				}
 			}
 
-			return {
-				filters: filters,
-			}
+			return erpnext.queries.item(filters);
 		});
 	},
 
