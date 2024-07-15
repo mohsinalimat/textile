@@ -41,8 +41,11 @@ class TextileOrder(StatusUpdaterERP):
 		if not self.meta.has_field("delivery_date"):
 			return
 
-		items_meta = frappe.get_meta(self.meta.get_field("items").options)
-		has_item_wise_delivery_date = items_meta.has_field("delivery_date")
+		if self.meta.has_field("items"):
+			items_meta = frappe.get_meta(self.meta.get_field("items").options)
+			has_item_wise_delivery_date = items_meta.has_field("delivery_date")
+		else:
+			has_item_wise_delivery_date = False
 
 		# Set delivery date from items
 		if has_item_wise_delivery_date:

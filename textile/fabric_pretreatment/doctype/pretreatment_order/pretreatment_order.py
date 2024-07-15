@@ -994,28 +994,23 @@ def create_work_order(pretreatment_order):
 
 @frappe.whitelist()
 def make_packing_slip(source_name, target_doc=None):
-	from erpnext.selling.doctype.sales_order.sales_order import make_packing_slip
+	from erpnext.manufacturing.doctype.work_order.work_order import make_packing_slip
 
 	doc = frappe.get_doc("Pretreatment Order", source_name)
 
-	selected_children = frappe.get_all("Sales Order Item", filters={"pretreatment_order": doc.name}, pluck="name")
-	frappe.flags.selected_children = {"items": selected_children}
+	work_order_filters = {
+		"pretreatment_order": doc.name,
+		"packing_slip_required": 1,
+		"status": ["!=", "Stopped"],
+		"docstatus": 1,
+		"company": doc.company,
+	}
 
-	sales_orders = frappe.db.sql("""
-		SELECT DISTINCT s.name
-		FROM `tabSales Order Item` i
-		INNER JOIN `tabSales Order` s ON s.name = i.parent
-		WHERE s.docstatus = 1 AND s.status NOT IN ('Closed', 'On Hold')
-			AND s.per_packed < 100 and i.skip_delivery_note = 0
-			AND s.company = %(company)s AND i.pretreatment_order = %(pretreatment_order)s
-	""", {"pretreatment_order": doc.name, "company": doc.company},  as_dict=1)
+	work_orders = frappe.get_all("Work Order", filters=work_order_filters, pluck="name")
+	if not work_orders:
+		frappe.throw(_("There are no Work Orders to be packed"))
 
-	if not sales_orders:
-		frappe.throw(_("There are no Sales Orders to be packed"))
-
-	for d in sales_orders:
-		target_doc = make_packing_slip(d.name, target_doc=target_doc)
-
+	target_doc = make_packing_slip(work_orders, target_doc=target_doc)
 	return target_doc
 
 

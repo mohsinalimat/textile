@@ -26,6 +26,9 @@ class PackingSlipDP(PackingSlip):
 		validate_transaction_against_pretreatment_order(self)
 
 	def set_default_package_type(self):
+		if self.package_type:
+			return
+
 		print_orders = set([d.get("print_order") for d in self.get("items") if d.get("print_order")])
 		pretreatment_orders = set([d.get("pretreatment_order") for d in self.get("items") if d.get("pretreatment_order")])
 
@@ -37,7 +40,7 @@ class PackingSlipDP(PackingSlip):
 				"default_package_type_for_ready_fabrics")
 
 		if self.package_type:
-			self.set_package_type_details()
+			self.set_package_type_details(force=True)
 
 	def set_default_rejected_warehouse(self):
 		print_orders = set([d.get("print_order") for d in self.get("items") if d.get("print_order")])
@@ -131,19 +134,6 @@ def update_packing_slip_mapper(item_mapper, source_doctype):
 	field_map["print_order_item"] = "print_order_item"
 
 
-def update_packing_slip_from_sales_order_mapper(mapper, target_doctype):
-	def postprocess(source, target):
-		target.set_default_package_type()
-		target.set_default_rejected_warehouse()
-		target._add_return_fabric()
-
-		if base_postprocess:
-			base_postprocess(source, target)
-
-	base_postprocess = mapper.get("postprocess")
-	mapper["postprocess"] = postprocess
-
-
 def update_unpack_from_packing_slip_mapper(mapper):
 	if not mapper.get("Packing Slip Item"):
 		return
@@ -154,6 +144,26 @@ def update_unpack_from_packing_slip_mapper(mapper):
 
 	field_map["print_order"] = "print_order"
 	field_map["print_order_item"] = "print_order_item"
+
+
+def postprocess_work_order_to_packing_slip_item(work_order, packing_slip, row):
+	row.pretreatment_order = work_order.pretreatment_order
+	row.print_order = work_order.print_order
+	row.print_order_item = work_order.print_order_item
+
+
+def postprocess_sales_order_to_packing_slip(sales_order, packing_slip):
+	postprocess_mapped_packing_slip(packing_slip)
+
+
+def postprocess_work_orders_to_packing_slip(work_orders, packing_slip):
+	postprocess_mapped_packing_slip(packing_slip)
+
+
+def postprocess_mapped_packing_slip(packing_slip):
+	packing_slip.set_default_package_type()
+	packing_slip.set_default_rejected_warehouse()
+	packing_slip._add_return_fabric()
 
 
 def override_packing_slip_dashboard(data):

@@ -1403,35 +1403,29 @@ def make_packing_slip_for_items(source, target_doc=None):
 
 @frappe.whitelist()
 def make_packing_slip(source_name, target_doc=None, selected_rows=None):
-	from erpnext.selling.doctype.sales_order.sales_order import make_packing_slip
+	from erpnext.manufacturing.doctype.work_order.work_order import make_packing_slip
 
 	doc = frappe.get_doc("Print Order", source_name)
 
 	if selected_rows and isinstance(selected_rows, str):
 		selected_rows = json.loads(selected_rows)
 
+	work_order_filters = {
+		"packing_slip_required": 1,
+		"status": ["!=", "Stopped"],
+		"docstatus": 1,
+		"company": doc.company,
+	}
 	if selected_rows:
-		selected_children = frappe.get_all("Sales Order Item", filters={"print_order_item": ["in", selected_rows]}, pluck="name")
-		frappe.flags.selected_children = {"items": selected_children}
+		work_order_filters["print_order_item"] = ["in", selected_rows]
 	else:
-		selected_children = frappe.get_all("Sales Order Item", filters={"print_order": doc.name}, pluck="name")
-		frappe.flags.selected_children = {"items": selected_children}
+		work_order_filters["print_order"] = doc.name
 
-	sales_orders = frappe.db.sql("""
-		SELECT DISTINCT s.name
-		FROM `tabSales Order Item` i
-		INNER JOIN `tabSales Order` s ON s.name = i.parent
-		WHERE s.docstatus = 1 AND s.status NOT IN ('Closed', 'On Hold')
-			AND s.per_packed < 100 AND i.skip_delivery_note = 0
-			AND s.company = %(company)s AND i.print_order = %(print_order)s
-	""", {"print_order": doc.name, "company": doc.company},  as_dict=1)
+	work_orders = frappe.get_all("Work Order", filters=work_order_filters, pluck="name")
+	if not work_orders:
+		frappe.throw(_("There are no Work Orders to be packed"))
 
-	if not sales_orders:
-		frappe.throw(_("There are no Sales Orders to be packed"))
-
-	for d in sales_orders:
-		target_doc = make_packing_slip(d.name, target_doc=target_doc)
-
+	target_doc = make_packing_slip(work_orders, target_doc=target_doc)
 	return target_doc
 
 
