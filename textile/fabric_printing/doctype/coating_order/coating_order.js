@@ -285,8 +285,8 @@ textile.CoatingOrder = class CoatingOrder extends textile.TextileOrder {
 				progress_bars: [
 					{
 						title: __("<b>Coated:</b> {0} / {1} {2} ({3}%)", [
-							format_number(me.frm.doc.coated_qty),
-							format_number(me.frm.doc.stock_qty),
+							frappe.format(me.frm.doc.coated_qty, {'fieldtype': 'Float'}, { inline: 1 }),
+							frappe.format(me.frm.doc.stock_qty, {'fieldtype': 'Float'}, { inline: 1 }),
 							me.frm.doc.stock_uom,
 							format_number(me.frm.doc.stock_qty ? me.frm.doc.coated_qty / me.frm.doc.stock_qty * 100: 0, null, 1),
 						]),
@@ -295,7 +295,7 @@ textile.CoatingOrder = class CoatingOrder extends textile.TextileOrder {
 						add_min_width: me.frm.doc.stock_qty ? 0.5 : 0,
 					},
 					{
-						title: __("<b>Coating Remaining:</b> {0} {1}", [format_number(me.frm.doc.stock_qty - me.frm.doc.coated_qty), me.frm.doc.stock_uom]),
+						title: __("<b>Coating Remaining:</b> {0} {1}", [frappe.format((me.frm.doc.stock_qty - me.frm.doc.coated_qty), {'fieldtype': 'Float'}, { inline: 1 }), me.frm.doc.stock_uom]),
 						completed_qty: me.frm.doc.stock_qty - me.frm.doc.coated_qty,
 						progress_class: "progress-bar-warning",
 					},
