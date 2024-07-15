@@ -29,15 +29,42 @@ class TextileOrder(StatusUpdaterERP):
 				self.set(f, clean_whitespace(self.get(f)))
 
 	def validate_dates(self):
+		self.validate_delivery_date()
+
+		if self.get("po_date") and self.get("delivery_date") and getdate(self.delivery_date) < getdate(self.po_date):
+			frappe.throw(_("Planned Delivery Date cannot be before Customer's Purchase Order Date"))
+
+		if self.get("planned_end_date") and getdate(self.planned_end_date) < getdate(self.transaction_date):
+			frappe.throw(_("Planned End Date cannot be before Order Date"))
+
+	def validate_delivery_date(self):
+		if not self.meta.has_field("delivery_date"):
+			return
+
+		items_meta = frappe.get_meta(self.meta.get_field("items").options)
+		has_item_wise_delivery_date = items_meta.has_field("delivery_date")
+
+		# Set delivery date from items
+		if has_item_wise_delivery_date:
+			item_delivery_dates = [getdate(d.delivery_date) for d in self.get("items") if d.delivery_date]
+			max_item_delivery_date = max(item_delivery_dates) if item_delivery_dates else None
+
+			if max_item_delivery_date and (not self.delivery_date or getdate(self.delivery_date) != max_item_delivery_date):
+				self.delivery_date = max_item_delivery_date
+
+		# Validate parent delivery date
 		if self.get("delivery_date"):
-			if self.get("transaction_date") and getdate(self.delivery_date) < getdate(self.transaction_date):
+			if getdate(self.delivery_date) < getdate(self.transaction_date):
 				frappe.throw(_("Planned Delivery Date cannot be before Order Date"))
 
-			if self.get("planned_end_date") and getdate(self.planned_end_date) < getdate(self.transaction_date):
-				frappe.throw(_("Planned End Date cannot be before Order Date"))
+		# Validate items delivery date
+		if has_item_wise_delivery_date:
+			for d in self.get("items"):
+				if not d.delivery_date and self.delivery_date:
+					d.delivery_date = self.delivery_date
 
-			if self.get("po_date") and getdate(self.delivery_date) < getdate(self.po_date):
-				frappe.throw(_("Planned Delivery Date cannot be before Customer's Purchase Order Date"))
+				if d.delivery_date and getdate(d.delivery_date) < getdate(self.transaction_date):
+					frappe.throw(_("Row #{0}: Planned Delivery Date cannot be before Order Date").format(d.idx))
 
 	def validate_customer(self):
 		if self.get("customer"):
