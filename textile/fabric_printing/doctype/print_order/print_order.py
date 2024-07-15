@@ -523,6 +523,7 @@ class PrintOrder(TextileOrder):
 				"production_qty": pending_qty,
 				"customer": self.customer,
 				"customer_name": self.customer_name,
+				"delivery_date": self.delivery_date,
 				"cost_center": self.get("cost_center"),
 			}
 
