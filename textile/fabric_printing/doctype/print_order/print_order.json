@@ -99,6 +99,7 @@
   "column_break_r0yyq",
   "packing_status",
   "per_packed",
+  "per_shrinked",
   "column_break_paad7",
   "delivery_status",
   "per_delivered"
@@ -378,7 +379,7 @@
    "in_standard_filter": 1,
    "label": "Status",
    "no_copy": 1,
-   "options": "Draft\nNot Started\nTo Produce\nTo Deliver\nCompleted\nClosed\nCancelled",
+   "options": "Draft\nNot Started\nTo Produce\nTo Deliver\nTo Close\nCompleted\nClosed\nCancelled",
    "print_hide": 1,
    "read_only": 1,
    "reqd": 1,
@@ -769,12 +770,20 @@
    "fieldtype": "Check",
    "label": "Skip Fabric Transfer to WIP Warehouse",
    "read_only": 1
+  },
+  {
+   "fieldname": "per_shrinked",
+   "fieldtype": "Percent",
+   "label": "% Shrinked",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-03-22 10:02:10.330667",
+ "modified": "2024-07-12 14:46:40.054673",
  "modified_by": "Administrator",
  "module": "Fabric Printing",
  "name": "Print Order",

@@ -67,4 +67,11 @@ textile.TextileOrder = class TextileOrder extends frappe.ui.form.Controller {
 			this.frm.set_value(qty_field, 0);
 		}
 	}
+
+	set_items_delivery_date() {
+		for (let d of this.frm.doc.items || []) {
+			d.delivery_date = this.frm.doc.delivery_date;
+			refresh_field("delivery_date", d.name, "items");
+		}
+	}
 }

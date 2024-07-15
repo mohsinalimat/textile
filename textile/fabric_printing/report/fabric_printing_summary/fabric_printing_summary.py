@@ -130,7 +130,7 @@ class FabricPrintingSummary:
 
 		self.packing_backlog_data = frappe.db.sql("""
 			SELECT item.fabric_material,
-				SUM(poi.produced_qty - poi.packed_qty) as packing_backlog_qty
+				SUM(poi.produced_qty - poi.packed_qty - poi.shrinked_qty) as packing_backlog_qty
 			FROM `tabPrint Order Item` poi
 			INNER JOIN `tabPrint Order` pro ON pro.name = poi.parent
 			INNER JOIN `tabItem` item ON item.name = pro.fabric_item
@@ -138,7 +138,7 @@ class FabricPrintingSummary:
 				and pro.packing_status = 'To Pack'
 				and pro.status != 'Closed'
 				and pro.transaction_date <= %(to_date)s
-				and poi.packed_qty < poi.produced_qty
+				and poi.packed_qty + poi.shrinked_qty < poi.produced_qty
 			GROUP BY item.fabric_material
 		""", self.filters, as_dict=1)
 

@@ -47,12 +47,13 @@
   "stock_uom",
   "status_section",
   "ordered_qty",
+  "delivered_qty",
   "column_break_7pjlp",
   "work_order_qty",
   "produced_qty",
   "column_break_djowp",
   "packed_qty",
-  "delivered_qty",
+  "shrinked_qty",
   "image_section",
   "design_image",
   "design_image_view"
@@ -382,12 +383,19 @@
    "fieldtype": "Check",
    "label": "Show Panels",
    "read_only": 1
+  },
+  {
+   "fieldname": "shrinked_qty",
+   "fieldtype": "Float",
+   "label": "Shrinked Qty",
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-09-09 15:53:57.148921",
+ "modified": "2024-07-12 12:52:28.138453",
  "modified_by": "Administrator",
  "module": "Fabric Printing",
  "name": "Print Order Item",

@@ -319,7 +319,7 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 			let has_unpacked = !doc.is_internal_customer && doc.items.some(d => {
 				let qty_precision = precision("stock_print_length", d);
 				return flt(d.produced_qty, qty_precision)
-					&& flt(d.packed_qty, qty_precision) < flt(d.produced_qty, qty_precision)
+					&& flt(flt(d.packed_qty) + flt(d.shrinked_qty), qty_precision) < flt(d.produced_qty, qty_precision)
 			});
 
 			let has_undelivered = !doc.is_internal_customer && doc.items.some(d => {
@@ -356,6 +356,15 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					&& (doc.fabric_transfer_status == "To Transfer" || doc.delivery_status == "To Deliver")
 				) {
 					this.frm.add_custom_button(__('Fabric Transfer Entry'), () => this.make_fabric_transfer_entry(),
+						__("Create"));
+				}
+
+				if (
+					frappe.model.can_create("Stock Entry")
+					&& doc.packing_slip_required
+					&& has_unpacked
+				) {
+					this.frm.add_custom_button(__('Fabric Shrinkage Entry'), () => this.make_fabric_shrinkage_entry(),
 						__("Create"));
 				}
 
@@ -804,6 +813,21 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 		}, null, true);
 	}
 
+	make_fabric_shrinkage_entry() {
+		return frappe.call({
+			method: "textile.fabric_printing.doctype.print_order.print_order.make_fabric_shrinkage_entry",
+			args: {
+				"print_order": this.frm.doc.name,
+			},
+			callback: function (r) {
+				if (!r.exc) {
+					let doclist = frappe.model.sync(r.message);
+					frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+				}
+			}
+		});
+	}
+
 	show_fabric_transfer_qty_prompt(callback, qty_description, suggest_qty) {
 		let remaining_transfer_qty = Math.max(flt(this.frm.doc.total_fabric_length) - flt(this.frm.doc.fabric_transfer_qty), 0);
 		return frappe.prompt([
@@ -948,7 +972,8 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 		}
 
 		let packed_qty = frappe.utils.sum(this.frm.doc.items.map(d => d.packed_qty));
-		let to_pack_qty = produced_qty - packed_qty;
+		let shrinked_qty = frappe.utils.sum(this.frm.doc.items.map(d => d.shrinked_qty));
+		let to_pack_qty = produced_qty - packed_qty - shrinked_qty;
 		to_pack_qty = Math.max(to_pack_qty, 0);
 
 		erpnext.utils.show_progress_for_qty({
@@ -967,7 +992,16 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					add_min_width: 0.5,
 				},
 				{
-					title: __("<b>To Pack:</b> {0} {1}", [frappe.format(to_pack_qty, {'fieldtype': 'Float'}, { inline: 1 }), "Meter"]),
+          title: __("<b>Shrinked:</b> {0} {1} ({2}%)", [
+						frappe.format(shrinked_qty, {'fieldtype': 'Float'}, { inline: 1 }),
+						"Meter",
+						format_number(shrinked_qty / this.frm.doc.total_print_length * 100, null, 1),
+					]),
+					completed_qty: shrinked_qty,
+					progress_class: "progress-bar-info",
+				},
+				{
+          title: __("<b>To Pack:</b> {0} {1}", [frappe.format(to_pack_qty, {'fieldtype': 'Float'}, { inline: 1 }), "Meter"]),
 					completed_qty: to_pack_qty,
 					progress_class: "progress-bar-warning",
 				},

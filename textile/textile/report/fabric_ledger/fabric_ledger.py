@@ -39,6 +39,8 @@ class FabricLedger:
 		]
 		self.filters.rejected_warehouses = [v for v in self.filters.rejected_warehouses if v]
 
+		self.filters.shrinkage_stock_entry_type = frappe.db.get_single_value("Fabric Printing Settings", "stock_entry_type_for_fabric_shrinkage")
+
 	def get_items(self):
 		self.ready_fabric_items = []
 		self.greige_fabric_items = []
@@ -91,7 +93,7 @@ class FabricLedger:
 				item.textile_item_type,
 				fabric_item.name as fabric_item, fabric_item.item_name as fabric_item_name,
 				sle.actual_qty, sle.stock_uom as uom,
-				ste.purpose, ste.work_order, ste.coating_order,
+				ste.purpose, ste.stock_entry_type, ste.work_order, ste.coating_order,
 				ste.print_order as ste_print_order, ste.pretreatment_order as ste_pretreatment_order,
 				dni.print_order as dni_print_order, dni.pretreatment_order as dni_pretreatment_order,
 				psi.print_order as psi_print_order, psi.pretreatment_order as psi_pretreatment_order
@@ -227,7 +229,10 @@ class FabricLedger:
 				elif row.purpose == "Material Transfer for Manufacture":
 					row.entry_type = "Transfer to Production"
 				elif row.purpose == "Material Issue":
-					row.entry_type = "Reconciliation"
+					if self.filters.shrinkage_stock_entry_type and row.stock_entry_type == self.filters.shrinkage_stock_entry_type:
+						row.entry_type = "Shrinkage"
+					else:
+						row.entry_type = "Reconciliation"
 				else:
 					row.entry_type = row.purpose
 			elif row.voucher_type == "Delivery Note":
