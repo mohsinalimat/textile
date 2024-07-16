@@ -202,7 +202,7 @@ class TextileOrder(TransactionBase):
 
 	@staticmethod
 	def validate_item_has_bom(item_code):
-		if frappe.db.get_value("Item", item_code, "is_stock_item", cache=1):
+		if not frappe.db.get_value("Item", item_code, "is_stock_item", cache=1):
 			return
 
 		default_bom = frappe.db.get_value("Item", item_code, "default_bom", cache=1)
