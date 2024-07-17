@@ -947,8 +947,8 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 			progress_bars: [
 				{
 					title: __('<b>Produced:</b> {0} / {1} {2} ({3}%)', [
-						format_number(produced_qty),
-						format_number(this.frm.doc.total_print_length),
+						frappe.format(produced_qty, {'fieldtype': 'Float'}, { inline: 1 }),
+						frappe.format(this.frm.doc.total_print_length, {'fieldtype': 'Float'}, { inline: 1 }),
 						"Meter",
 						format_number(produced_qty / this.frm.doc.total_print_length * 100, null, 1),
 					]),
@@ -957,7 +957,7 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					add_min_width: 0.5,
 				},
 				{
-					title: __("<b>Remaining:</b> {0} {1}", [format_number(remaining_print), "Meter"]),
+					title: __("<b>Remaining:</b> {0} {1}", [frappe.format(remaining_print, {'fieldtype': 'Float'}, { inline: 1 }), "Meter"]),
 					completed_qty: remaining_print,
 					progress_class: "progress-bar-warning",
 				},
@@ -983,7 +983,7 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 			progress_bars: [
 				{
 					title: __('<b>Packed:</b> {0} {1} ({2}%)', [
-						format_number(packed_qty),
+						frappe.format(packed_qty, {'fieldtype': 'Float'}, { inline: 1 }),
 						"Meter",
 						format_number(packed_qty / this.frm.doc.total_print_length * 100, null, 1),
 					]),
@@ -992,8 +992,8 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					add_min_width: 0.5,
 				},
 				{
-					title: __("<b>Shrinked:</b> {0} {1} ({2}%)", [
-						format_number(shrinked_qty),
+          title: __("<b>Shrinked:</b> {0} {1} ({2}%)", [
+						frappe.format(shrinked_qty, {'fieldtype': 'Float'}, { inline: 1 }),
 						"Meter",
 						format_number(shrinked_qty / this.frm.doc.total_print_length * 100, null, 1),
 					]),
@@ -1001,7 +1001,7 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					progress_class: "progress-bar-info",
 				},
 				{
-					title: __("<b>To Pack:</b> {0} {1}", [format_number(to_pack_qty), "Meter"]),
+          title: __("<b>To Pack:</b> {0} {1}", [frappe.format(to_pack_qty, {'fieldtype': 'Float'}, { inline: 1 }), "Meter"]),
 					completed_qty: to_pack_qty,
 					progress_class: "progress-bar-warning",
 				},
@@ -1032,7 +1032,7 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 			progress_bars: [
 				{
 					title: __('<b>Delivered:</b> {0} {1} ({2}%)', [
-						format_number(delivered_qty),
+						frappe.format(delivered_qty, {'fieldtype': 'Float'}, { inline: 1 }),
 						"Meter",
 						format_number(delivered_qty / this.frm.doc.total_print_length * 100, null, 1),
 					]),
@@ -1041,7 +1041,7 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					add_min_width: 0.5,
 				},
 				{
-					title: __("<b>Ready to Deliver:</b> {0} {1}", [format_number(to_deliver), "Meter"]),
+					title: __("<b>Ready to Deliver:</b> {0} {1}", [frappe.format(to_deliver, {'fieldtype': 'Float'}, { inline: 1 }), "Meter"]),
 					completed_qty: to_deliver,
 					progress_class: "progress-bar-warning",
 				},
