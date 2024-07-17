@@ -225,8 +225,8 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 		let nbsp_fields = ["design_name"];
 
 		if (field.fieldname == "design_size") {
-			let width_df =  frappe.meta.get_docfield(doc.doctype, "design_width");
-			let height_df =  frappe.meta.get_docfield(doc.doctype, "design_height");
+			let width_df = frappe.meta.get_docfield(doc.doctype, "design_width");
+			let height_df = frappe.meta.get_docfield(doc.doctype, "design_height");
 
 			return frappe.format(doc["design_width"], width_df, { inline: 1 }, doc)
 				+ " x "
@@ -957,7 +957,10 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					add_min_width: 0.5,
 				},
 				{
-					title: __("<b>Remaining:</b> {0} {1}", [frappe.format(remaining_print, {'fieldtype': 'Float'}, { inline: 1 }), "Meter"]),
+					title: __("<b>Remaining:</b> {0} {1}", [
+						frappe.format(remaining_print, {'fieldtype': 'Float'}, { inline: 1 }),
+						"Meter"
+					]),
 					completed_qty: remaining_print,
 					progress_class: "progress-bar-warning",
 				},
@@ -992,7 +995,7 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					add_min_width: 0.5,
 				},
 				{
-          title: __("<b>Shrinked:</b> {0} {1} ({2}%)", [
+					title: __("<b>Shrinked:</b> {0} {1} ({2}%)", [
 						frappe.format(shrinked_qty, {'fieldtype': 'Float'}, { inline: 1 }),
 						"Meter",
 						format_number(shrinked_qty / this.frm.doc.total_print_length * 100, null, 1),
@@ -1001,7 +1004,10 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					progress_class: "progress-bar-info",
 				},
 				{
-          title: __("<b>To Pack:</b> {0} {1}", [frappe.format(to_pack_qty, {'fieldtype': 'Float'}, { inline: 1 }), "Meter"]),
+					title: __("<b>To Pack:</b> {0} {1}", [
+						frappe.format(to_pack_qty, {'fieldtype': 'Float'}, { inline: 1 }),
+						"Meter"
+					]),
 					completed_qty: to_pack_qty,
 					progress_class: "progress-bar-warning",
 				},
@@ -1041,7 +1047,10 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					add_min_width: 0.5,
 				},
 				{
-					title: __("<b>Ready to Deliver:</b> {0} {1}", [frappe.format(to_deliver, {'fieldtype': 'Float'}, { inline: 1 }), "Meter"]),
+					title: __("<b>Ready to Deliver:</b> {0} {1}", [
+						frappe.format(to_deliver, {'fieldtype': 'Float'}, { inline: 1 }),
+						"Meter"
+					]),
 					completed_qty: to_deliver,
 					progress_class: "progress-bar-warning",
 				},

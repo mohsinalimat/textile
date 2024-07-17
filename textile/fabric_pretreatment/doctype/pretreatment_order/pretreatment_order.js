@@ -254,7 +254,10 @@ textile.PretreatmentOrder = class PretreatmentOrder extends textile.TextileOrder
 					add_min_width: 0.5,
 				},
 				{
-					title: __("<b>To Pack:</b> {0} {1}", [frappe.format(to_pack_qty, {'fieldtype': 'Float'}, { inline: 1 }), "Meter"]),
+					title: __("<b>To Pack:</b> {0} {1}", [
+						frappe.format(to_pack_qty, {'fieldtype': 'Float'}, { inline: 1 }),
+						"Meter"
+					]),
 					completed_qty: to_pack_qty,
 					progress_class: "progress-bar-warning",
 				},
@@ -294,7 +297,10 @@ textile.PretreatmentOrder = class PretreatmentOrder extends textile.TextileOrder
 					add_min_width: 0.5,
 				},
 				{
-					title: __("<b>Ready to Deliver:</b> {0} {1}", [frappe.format(to_deliver, {'fieldtype': 'Float'}, { inline: 1 }), "Meter"]),
+					title: __("<b>Ready to Deliver:</b> {0} {1}", [
+						frappe.format(to_deliver, {'fieldtype': 'Float'}, { inline: 1 }),
+						"Meter"
+					]),
 					completed_qty: to_deliver,
 					progress_class: "progress-bar-warning",
 				},
