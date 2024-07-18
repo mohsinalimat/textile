@@ -158,7 +158,7 @@ class TextileOrder(TransactionBase):
 		return flt(bin_details.get("actual_qty"))
 
 	@staticmethod
-	def add_components_to_bom(bom_doc, components, fabric_gsm, fabric_width, fabric_per_pickup):
+	def add_fabric_components_to_bom(bom_doc, components, fabric_gsm, fabric_width, fabric_per_pickup):
 		for component in components:
 			if component.consumption_by_fabric_weight:
 				bom_qty_precision = frappe.get_precision("BOM Item", "qty")
@@ -179,7 +179,9 @@ class TextileOrder(TransactionBase):
 				qty = 1
 				uom = "Meter"
 
-			TextileOrder.validate_item_has_bom(component.item_code)
+			if not component.do_not_validate_bom:
+				TextileOrder.validate_item_has_bom(component.item_code)
+
 			TextileOrder.validate_item_convertible_to_uom(component.item_code, uom)
 
 			bom_doc.append("items", {

@@ -291,7 +291,7 @@ class PretreatmentOrder(TextileOrder):
 
 				components.append(component)
 
-		self.add_components_to_bom(bom_doc, components, self.greige_fabric_gsm, self.greige_fabric_width,
+		self.add_fabric_components_to_bom(bom_doc, components, self.greige_fabric_gsm, self.greige_fabric_width,
 			self.greige_fabric_per_pickup)
 
 		return bom_doc

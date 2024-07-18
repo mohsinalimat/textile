@@ -1003,12 +1003,13 @@ class PrintOrder(TextileOrder):
 			if self.get(f"{component_item_field}_required"):
 				component = frappe._dict({
 					"item_code": self.get(component_item_field),
-					"consumption_by_fabric_weight": cint(self.get(f"{component_item_field}_by_fabric_weight"))
+					"consumption_by_fabric_weight": cint(self.get(f"{component_item_field}_by_fabric_weight")),
+					"do_not_validate_bom": component_item_field in ("sublimation_paper_item", "protection_paper_item"),
 				})
 
 				components.append(component)
 
-		self.add_components_to_bom(bom_doc, components, self.fabric_gsm, self.fabric_width, self.fabric_per_pickup)
+		self.add_fabric_components_to_bom(bom_doc, components, self.fabric_gsm, self.fabric_width, self.fabric_per_pickup)
 
 		return bom_doc
 
