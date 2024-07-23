@@ -23,10 +23,11 @@
   "default_printing_fg_warehouse",
   "default_printing_rejected_warehouse",
   "stock_entry_type_section",
-  "stock_entry_type_for_fabric_transfer",
-  "stock_entry_type_for_fabric_shrinkage",
-  "column_break_x00kc",
   "stock_entry_type_for_print_production",
+  "stock_entry_type_for_fabric_transfer",
+  "column_break_x00kc",
+  "stock_entry_type_for_fabric_rejection",
+  "stock_entry_type_for_fabric_shrinkage",
   "column_break_5kn2h",
   "stock_entry_type_for_fabric_coating"
  ],
@@ -150,12 +151,18 @@
    "fieldtype": "Link",
    "label": "Stock Entry Type for Fabric Shrinkage",
    "options": "Stock Entry Type"
+  },
+  {
+   "fieldname": "stock_entry_type_for_fabric_rejection",
+   "fieldtype": "Link",
+   "label": "Stock Entry Type for Fabric Rejection",
+   "options": "Stock Entry Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-07-12 12:54:38.168645",
+ "modified": "2024-07-23 12:00:12.291841",
  "modified_by": "Administrator",
  "module": "Fabric Printing",
  "name": "Fabric Printing Settings",

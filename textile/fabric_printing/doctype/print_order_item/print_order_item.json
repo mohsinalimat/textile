@@ -53,6 +53,7 @@
   "produced_qty",
   "column_break_djowp",
   "packed_qty",
+  "rejected_qty",
   "shrinked_qty",
   "image_section",
   "design_image",
@@ -390,12 +391,19 @@
    "label": "Shrinked Qty",
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "rejected_qty",
+   "fieldtype": "Float",
+   "label": "Rejected Qty",
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-07-12 12:52:28.138453",
+ "modified": "2024-07-23 10:38:48.249248",
  "modified_by": "Administrator",
  "module": "Fabric Printing",
  "name": "Print Order Item",

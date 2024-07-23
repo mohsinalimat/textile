@@ -43,5 +43,12 @@ frappe.ui.form.on('Fabric Printing Settings', {
 				}
 			};
 		});
+		frm.set_query("stock_entry_type_for_fabric_rejection", function(doc) {
+			return {
+				filters: {
+					purpose: "Material Transfer",
+				}
+			};
+		});
 	}
 });

@@ -18,13 +18,13 @@ class StockEntryDP(StockEntry):
 	def on_submit(self):
 		super().on_submit()
 		self.update_print_order_fabric_transfer_status()
-		self.update_print_order_shrinkage_status()
+		self.update_print_order_reconciliation_status()
 		self.update_coating_order(validate_coating_order_qty=True)
 
 	def on_cancel(self):
 		super().on_cancel()
 		self.update_print_order_fabric_transfer_status()
-		self.update_print_order_shrinkage_status()
+		self.update_print_order_reconciliation_status()
 		self.update_coating_order()
 
 	def set_stock_entry_type(self):
@@ -39,6 +39,8 @@ class StockEntryDP(StockEntry):
 				ste_type = printing_settings.stock_entry_type_for_fabric_transfer
 			elif self.purpose == "Material Issue":
 				ste_type = printing_settings.stock_entry_type_for_fabric_shrinkage
+			elif self.purpose == "Material Transfer":
+				ste_type = printing_settings.stock_entry_type_for_fabric_rejection
 
 		elif self.get("coating_order"):
 			if self.purpose == "Manufacture":
@@ -58,11 +60,7 @@ class StockEntryDP(StockEntry):
 			super().set_stock_entry_type()
 
 	def update_print_order_fabric_transfer_status(self):
-		if not self.get("print_order"):
-			return
-		if self.purpose not in ("Material Transfer", "Material Transfer for Manufacture"):
-			return
-		if self.get("work_order"):
+		if not self.get("print_order") or self.purpose != "Material Transfer for Manufacture" or self.get("work_order"):
 			return
 
 		if not frappe.flags.skip_print_order_status_update:
@@ -70,8 +68,8 @@ class StockEntryDP(StockEntry):
 			print_order.set_fabric_transfer_status(update=True)
 			print_order.notify_update()
 
-	def update_print_order_shrinkage_status(self):
-		if self.purpose != "Material Issue":
+	def update_print_order_reconciliation_status(self):
+		if self.purpose not in ("Material Issue", "Material Transfer"):
 			return
 
 		work_orders = list(set([d.work_order for d in self.items if d.get("work_order")]))

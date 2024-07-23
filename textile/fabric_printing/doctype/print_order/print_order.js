@@ -318,8 +318,9 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 
 			let has_unpacked = !doc.is_internal_customer && doc.items.some(d => {
 				let qty_precision = precision("stock_print_length", d);
+				let packing_completion = flt(d.packed_qty) + flt(d.rejected_qty) + flt(d.shrinked_qty);
 				return flt(d.produced_qty, qty_precision)
-					&& flt(flt(d.packed_qty) + flt(d.shrinked_qty), qty_precision) < flt(d.produced_qty, qty_precision)
+					&& flt(packing_completion, qty_precision) < flt(d.produced_qty, qty_precision)
 			});
 
 			let has_undelivered = !doc.is_internal_customer && doc.items.some(d => {
@@ -364,6 +365,8 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					&& doc.packing_slip_required
 					&& has_unpacked
 				) {
+					this.frm.add_custom_button(__('Fabric Rejection Entry'), () => this.make_fabric_rejection_entry(),
+						__("Create"));
 					this.frm.add_custom_button(__('Fabric Shrinkage Entry'), () => this.make_fabric_shrinkage_entry(),
 						__("Create"));
 				}
@@ -813,11 +816,28 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 		}, null, true);
 	}
 
-	make_fabric_shrinkage_entry() {
+	make_fabric_rejection_entry() {
 		return frappe.call({
-			method: "textile.fabric_printing.doctype.print_order.print_order.make_fabric_shrinkage_entry",
+			method: "textile.fabric_printing.doctype.print_order.print_order.make_fabric_reconciliation_entry",
 			args: {
 				"print_order": this.frm.doc.name,
+				"purpose": "Material Transfer",
+			},
+			callback: function (r) {
+				if (!r.exc) {
+					let doclist = frappe.model.sync(r.message);
+					frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+				}
+			}
+		});
+	}
+
+	make_fabric_shrinkage_entry() {
+		return frappe.call({
+			method: "textile.fabric_printing.doctype.print_order.print_order.make_fabric_reconciliation_entry",
+			args: {
+				"print_order": this.frm.doc.name,
+				"purpose": "Material Issue",
 			},
 			callback: function (r) {
 				if (!r.exc) {
@@ -975,8 +995,9 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 		}
 
 		let packed_qty = frappe.utils.sum(this.frm.doc.items.map(d => d.packed_qty));
+		let rejected_qty = frappe.utils.sum(this.frm.doc.items.map(d => d.rejected_qty));
 		let shrinked_qty = frappe.utils.sum(this.frm.doc.items.map(d => d.shrinked_qty));
-		let to_pack_qty = produced_qty - packed_qty - shrinked_qty;
+		let to_pack_qty = produced_qty - packed_qty - rejected_qty - shrinked_qty;
 		to_pack_qty = Math.max(to_pack_qty, 0);
 
 		erpnext.utils.show_progress_for_qty({
@@ -993,6 +1014,15 @@ textile.PrintOrder = class PrintOrder extends textile.TextileOrder {
 					completed_qty: packed_qty,
 					progress_class: "progress-bar-success",
 					add_min_width: 0.5,
+				},
+				{
+					title: __("<b>Rejected:</b> {0} {1} ({2}%)", [
+						frappe.format(rejected_qty, {'fieldtype': 'Float'}, { inline: 1 }),
+						"Meter",
+						format_number(rejected_qty / this.frm.doc.total_print_length * 100, null, 1),
+					]),
+					completed_qty: rejected_qty,
+					progress_class: "progress-bar-yellow",
 				},
 				{
 					title: __("<b>Shrinked:</b> {0} {1} ({2}%)", [

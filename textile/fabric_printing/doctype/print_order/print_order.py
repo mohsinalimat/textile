@@ -663,6 +663,7 @@ class PrintOrder(TextileOrder):
 			d.work_order_qty = flt(data.work_order_qty_map.get(d.name))
 			d.produced_qty = flt(data.produced_qty_map.get(d.name))
 			d.packed_qty = flt(data.packed_qty_map.get(d.name))
+			d.rejected_qty = flt(data.rejected_qty_map.get(d.name))
 			d.shrinked_qty = flt(data.shrinked_qty_map.get(d.name))
 
 			if update:
@@ -670,12 +671,14 @@ class PrintOrder(TextileOrder):
 					'work_order_qty': d.work_order_qty,
 					'produced_qty': d.produced_qty,
 					'packed_qty': d.packed_qty,
+					'rejected_qty': d.rejected_qty,
 					'shrinked_qty': d.shrinked_qty,
 				}, update_modified=update_modified)
 
 		self.per_work_ordered = flt(self.calculate_status_percentage('work_order_qty', 'stock_print_length', self.items))
 		self.per_produced = flt(self.calculate_status_percentage('produced_qty', 'stock_print_length', self.items))
 		self.per_packed = flt(self.calculate_status_percentage('packed_qty', 'stock_print_length', self.items))
+		self.per_rejected = flt(self.calculate_status_percentage('rejected_qty', 'stock_print_length', self.items))
 		self.per_shrinked = flt(self.calculate_status_percentage('shrinked_qty', 'stock_print_length', self.items))
 
 		production_within_allowance = self.per_work_ordered >= 100 and self.per_produced > 0 and not data.has_work_order_to_produce
@@ -683,7 +686,7 @@ class PrintOrder(TextileOrder):
 			not_applicable=self.status == "Closed" or not self.per_work_ordered,
 			within_allowance=production_within_allowance)
 
-		has_unpacked = [flt(d.produced_qty - d.packed_qty - d.shrinked_qty, d.precision("print_length")) for d in self.items]
+		has_unpacked = [flt(d.produced_qty - d.packed_qty - d.rejected_qty - d.shrinked_qty, d.precision("print_length")) for d in self.items]
 		has_unpacked = [q for q in has_unpacked if q > 0]
 
 		packing_within_allowance = (
@@ -701,6 +704,7 @@ class PrintOrder(TextileOrder):
 				'per_work_ordered': self.per_work_ordered,
 				'per_produced': self.per_produced,
 				'per_packed': self.per_packed,
+				'per_rejected': self.per_rejected,
 				'per_shrinked': self.per_shrinked,
 
 				'production_status': self.production_status,
@@ -712,6 +716,7 @@ class PrintOrder(TextileOrder):
 		out.work_order_qty_map = {}
 		out.produced_qty_map = {}
 		out.packed_qty_map = {}
+		out.rejected_qty_map = {}
 		out.shrinked_qty_map = {}
 		out.has_work_order_to_pack = False
 		out.has_work_order_to_produce = False
@@ -721,7 +726,7 @@ class PrintOrder(TextileOrder):
 			if row_names:
 				# Work Order
 				work_order_data = frappe.db.sql("""
-					SELECT print_order_item, qty, completed_qty, packed_qty, reconciled_qty,
+					SELECT print_order_item, qty, completed_qty, packed_qty, rejected_qty, reconciled_qty,
 						production_status, subcontracting_status, packing_status
 					FROM `tabWork Order`
 					WHERE docstatus = 1 AND print_order_item IN %s
@@ -736,6 +741,9 @@ class PrintOrder(TextileOrder):
 
 					out.packed_qty_map.setdefault(d.print_order_item, 0)
 					out.packed_qty_map[d.print_order_item] += flt(d.packed_qty)
+
+					out.rejected_qty_map.setdefault(d.print_order_item, 0)
+					out.rejected_qty_map[d.print_order_item] += flt(d.rejected_qty)
 
 					out.shrinked_qty_map.setdefault(d.print_order_item, 0)
 					out.shrinked_qty_map[d.print_order_item] += flt(d.reconciled_qty)
@@ -1333,7 +1341,7 @@ def make_fabric_transfer_entry(print_order, fabric_transfer_qty=None, for_submit
 
 
 @frappe.whitelist()
-def make_fabric_shrinkage_entry(print_order, for_submit=False):
+def make_fabric_reconciliation_entry(print_order, purpose, for_submit=False):
 	if isinstance(print_order, str):
 		doc = frappe.get_doc('Print Order', print_order)
 	else:
@@ -1345,23 +1353,30 @@ def make_fabric_shrinkage_entry(print_order, for_submit=False):
 	if not doc.packing_slip_required:
 		frappe.throw(_("Fabric Shrinkage Entry not required when Packing Slip is not required").format(doc.name))
 
+	if purpose not in ("Material Transfer", "Material Issue"):
+		frappe.throw(_("Invalid Purpose"))
+
 	stock_entry = frappe.new_doc("Stock Entry")
-	stock_entry.purpose = "Material Issue"
+	stock_entry.purpose = purpose
 	stock_entry.print_order = doc.name
 	stock_entry.company = doc.company
 	stock_entry.from_warehouse = doc.wip_warehouse
+
+	if purpose == "Material Transfer":
+		stock_entry.to_warehouse = frappe.get_cached_value("Fabric Printing Settings", None,
+			"default_printing_rejected_warehouse")
 
 	for d in doc.items:
 		work_orders = frappe.get_all("Work Order", filters={
 			"print_order_item": d.name, "docstatus": 1
 		}, fields=[
 			"name", "production_item",
-			"completed_qty", "packed_qty", "reconciled_qty",
+			"completed_qty", "packed_qty", "rejected_qty", "reconciled_qty",
 			"produce_fg_in_wip_warehouse", "wip_warehouse", "fg_warehouse"
 		])
 
 		for wo in work_orders:
-			unpacked_qty = flt(flt(wo.completed_qty) - flt(wo.packed_qty) - flt(wo.reconciled_qty),
+			unpacked_qty = flt(flt(wo.completed_qty) - flt(wo.packed_qty) - flt(wo.rejected_qty) - flt(wo.reconciled_qty),
 				stock_entry.precision("qty", "items"))
 			if unpacked_qty <= 0:
 				continue
@@ -1370,6 +1385,7 @@ def make_fabric_shrinkage_entry(print_order, for_submit=False):
 			row.work_order = wo.name
 			row.item_code = wo.production_item
 			row.s_warehouse = wo.wip_warehouse if wo.produce_fg_in_wip_warehouse else wo.fg_warehouse
+			row.t_warehouse = stock_entry.to_warehouse if purpose == "Material Transfer" else None
 			row.qty = unpacked_qty
 			row.uom = "Meter"
 
