@@ -48,13 +48,13 @@ The ERPNext Pakistan Workspace code is licensed as GNU General Public License (v
 
 ### Dashboard / Workspace
 
-<img src="https://raw.githubusercontent.com/ParaLogicTech/textile/version-14/docs/screenshots/printing-workspace.png" alt="Printing Workspace">
+<img src="https://raw.githubusercontent.com/ParaLogicTech/textile/version-14/docs/screenshots/printing-workspace.png" alt="Printing Workspace" style="max-width:800px">
 
 ### Print Order
-<img src="https://raw.githubusercontent.com/ParaLogicTech/textile/version-14/docs/screenshots/print-order.png" alt="Print Order">
+<img src="https://raw.githubusercontent.com/ParaLogicTech/textile/version-14/docs/screenshots/print-order.png" alt="Print Order" style="max-width:800px">
 
 ### Work Order List
-<img src="https://raw.githubusercontent.com/ParaLogicTech/textile/version-14/docs/screenshots/work-order-list.png" alt="Work Order List">
+<img src="https://raw.githubusercontent.com/ParaLogicTech/textile/version-14/docs/screenshots/work-order-list.png" alt="Work Order List" style="max-width:800px">
 
 ### Simplified Production Entry
-<img src="https://raw.githubusercontent.com/ParaLogicTech/textile/version-14/docs/screenshots/print-production-dialog.png" alt="Print Production Dialog">
+<img src="https://raw.githubusercontent.com/ParaLogicTech/textile/version-14/docs/screenshots/print-production-dialog.png" alt="Print Production Dialog" style="max-width:500px">
