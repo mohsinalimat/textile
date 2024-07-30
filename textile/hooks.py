@@ -6,7 +6,7 @@ app_publisher = "ParaLogic"
 app_description = "Textile ERP Application"
 app_email = "info@paralogic.io"
 app_license = "GNU General Public License (v3)"
-required_apps = ["erpnext"]
+required_apps = ["ParaLogicTech/erpnext"]
 
 app_include_js = "textile.bundle.js"
 app_include_css = "textile.bundle.css"
