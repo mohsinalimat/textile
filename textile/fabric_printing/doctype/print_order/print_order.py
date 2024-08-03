@@ -760,8 +760,8 @@ class PrintOrder(TextileOrder):
 			from_doctype=from_doctype, row_names=row_names, allowance_type="production")
 
 	def validate_packed_qty(self, from_doctype=None, row_names=None):
-		self.validate_completed_qty('packed_qty', 'stock_print_length', self.items,
-			from_doctype=from_doctype, row_names=row_names, allowance_type="production")
+		self.validate_completed_qty('packed_qty', 'stock_fabric_length', self.items,
+			from_doctype=from_doctype, row_names=row_names, allowance_type=None)
 
 	def set_delivery_status(self, update=False, update_modified=True):
 		data = self.get_delivered_status_data()
@@ -814,8 +814,8 @@ class PrintOrder(TextileOrder):
 		return out
 
 	def validate_delivered_qty(self, from_doctype=None, row_names=None):
-		self.validate_completed_qty('delivered_qty', 'stock_print_length', self.items,
-			from_doctype=from_doctype, row_names=row_names, allowance_type="qty")
+		self.validate_completed_qty('delivered_qty', 'stock_fabric_length', self.items,
+			from_doctype=from_doctype, row_names=row_names, allowance_type=None)
 
 	def _background_start_print_order(self, fabric_transfer_qty, publish_progress=True):
 		self._start_print_order.catch(self, fabric_transfer_qty=fabric_transfer_qty, publish_progress=publish_progress)
