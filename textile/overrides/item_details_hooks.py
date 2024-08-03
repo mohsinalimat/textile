@@ -43,7 +43,7 @@ def get_price_list_rate(item_code, price_list, args):
 		get_pretreatment_rate
 	from textile.controllers.textile_pricing_rule import get_fabric_rate
 
-	if not item_code or not price_list or args.get("transaction_type") != "selling":
+	if not item_code or not price_list or args.get("selling_or_buying") != "selling":
 		return
 
 	item = frappe.get_cached_doc("Item", item_code)

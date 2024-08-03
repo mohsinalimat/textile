@@ -8,9 +8,9 @@ frappe.ui.form.on("Sales Invoice", {
 	},
 
 	refresh: function (frm) {
-		frm.add_custom_button(__('Check Printing Rate'), () => textile.show_print_pricing_dialog(frm.doc.customer),
+		frm.add_custom_button(__('Check Printing Rate'), () => textile.show_print_pricing_dialog(frm.doc.customer, frm.doc.customer_name),
 			__("Prices"));
-		frm.add_custom_button(__('Check Pretreatment Rate'), () => textile.show_pretreatment_pricing_dialog(frm.doc.customer),
+		frm.add_custom_button(__('Check Pretreatment Rate'), () => textile.show_pretreatment_pricing_dialog(frm.doc.customer, frm.doc.customer_name),
 			__("Prices"));
 
 		if (frappe.model.can_read("Print Order") || frappe.model.can_select("Print Order")) {
