@@ -76,6 +76,16 @@ frappe.query_reports["Pretreatment Production Register"] = {
 			options: "Fabric Type",
 		},
 		{
+			fieldname: "customer_provided_items",
+			label: __("Customer Provided Fabrics"),
+			fieldtype: "Select",
+			options: [
+				"",
+				"Customer Provided Fabrics Only",
+				"Exclude Customer Provided Fabrics",
+			]
+		},
+		{
 			fieldname: "customer",
 			label: __("Customer"),
 			fieldtype: "Link",
@@ -95,6 +105,51 @@ frappe.query_reports["Pretreatment Production Register"] = {
 				}
 				return frappe.db.get_link_options('Pretreatment Order', txt, filters);
 			}
+		},
+		{
+			fieldname: "singeing_item",
+			label: __("Singeing Item"),
+			fieldtype: "Link",
+			options: "Item",
+			get_query: function() {
+				return {
+					query: "erpnext.controllers.queries.item_query",
+					filters: {
+						'textile_item_type': "Process Component",
+						'process_component': "Singeing",
+					}
+				};
+			},
+		},
+		{
+			fieldname: "desizing_item",
+			label: __("Desizing Item"),
+			fieldtype: "Link",
+			options: "Item",
+			get_query: function() {
+				return {
+					query: "erpnext.controllers.queries.item_query",
+					filters: {
+						'textile_item_type': "Process Component",
+						'process_component': "Desizing",
+					}
+				};
+			},
+		},
+		{
+			fieldname: "bleaching_item",
+			label: __("Bleaching Item"),
+			fieldtype: "Link",
+			options: "Item",
+			get_query: function() {
+				return {
+					query: "erpnext.controllers.queries.item_query",
+					filters: {
+						'textile_item_type': "Process Component",
+						'process_component': "Bleaching",
+					}
+				};
+			},
 		},
 		{
 			fieldname: "group_by_1",

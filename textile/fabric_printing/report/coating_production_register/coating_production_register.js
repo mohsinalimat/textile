@@ -63,6 +63,16 @@ frappe.query_reports["Coating Production Register"] = {
 			options: "Fabric Type",
 		},
 		{
+			fieldname: "customer_provided_items",
+			label: __("Customer Provided Fabrics"),
+			fieldtype: "Select",
+			options: [
+				"",
+				"Customer Provided Fabrics Only",
+				"Exclude Customer Provided Fabrics",
+			]
+		},
+		{
 			fieldname: "customer",
 			label: __("Customer"),
 			fieldtype: "Link",

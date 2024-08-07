@@ -46,14 +46,12 @@ class PretreatmentProductionRegister:
 				wo.fabric_item as greige_fabric, wo.fabric_item_name as greige_fabric_name,
 				item.net_weight_per_unit, item.weight_uom
 			FROM `tabStock Entry` se
-			INNER JOIN `tabWork Order` wo
-				ON wo.name = se.work_order
-			LEFT JOIN `tabItem` item
-				ON item.name = wo.fabric_item
+			INNER JOIN `tabWork Order` wo ON wo.name = se.work_order
+			INNER JOIN `tabPretreatment Order` pro ON pro.name = wo.pretreatment_order
+			LEFT JOIN `tabItem` item ON item.name = wo.fabric_item
 			WHERE se.docstatus = 1
 				AND se.posting_date between %(from_date)s AND %(to_date)s
 				AND se.purpose = 'Manufacture'
-				AND ifnull(wo.pretreatment_order, '') != ''
 				{conditions}
 			ORDER BY se.posting_date, se.posting_time
 		""".format(conditions=conditions), self.filters, as_dict=1)
@@ -88,6 +86,21 @@ class PretreatmentProductionRegister:
 
 		if self.filters.fabric_type:
 			conditions.append("item.fabric_type = %(fabric_type)s")
+
+		if self.filters.singeing_item:
+			conditions.append("pro.singeing_item = %(singeing_item)s")
+
+		if self.filters.desizing_item:
+			conditions.append("pro.desizing_item = %(desizing_item)s")
+
+		if self.filters.bleaching_item:
+			conditions.append("pro.bleaching_item = %(bleaching_item)s")
+
+		if self.filters.get("customer_provided_items"):
+			if self.filters.get("customer_provided_items") == "Customer Provided Fabrics Only":
+				conditions.append("item.is_customer_provided_item = 1")
+			elif self.filters.get("customer_provided_items") == "Exclude Customer Provided Fabrics":
+				conditions.append("item.is_customer_provided_item = 0")
 
 		if self.filters.pretreatment_order:
 			if isinstance(self.filters.pretreatment_order, str):

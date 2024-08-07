@@ -86,6 +86,12 @@ class CoatingProductionRegister:
 		if self.filters.fabric_type:
 			conditions.append("item.fabric_type = %(fabric_type)s")
 
+		if self.filters.get("customer_provided_items"):
+			if self.filters.get("customer_provided_items") == "Customer Provided Fabrics Only":
+				conditions.append("item.is_customer_provided_item = 1")
+			elif self.filters.get("customer_provided_items") == "Exclude Customer Provided Fabrics":
+				conditions.append("item.is_customer_provided_item = 0")
+
 		if self.filters.coating_order:
 			if isinstance(self.filters.coating_order, str):
 				self.filters.coating_order = cstr(self.filters.coating_order).strip()
