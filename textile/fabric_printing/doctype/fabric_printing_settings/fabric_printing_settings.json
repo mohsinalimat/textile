@@ -12,7 +12,12 @@
   "column_break_qidqn",
   "default_printing_cost_center",
   "default_coating_cost_center",
+  "column_break_gfkuh",
   "wastage_mandatory",
+  "coating_item_mandatory",
+  "softener_item_mandatory",
+  "sublimation_paper_item_mandatory",
+  "protection_paper_item_mandatory",
   "warehouse_section",
   "default_printing_fabric_warehouse",
   "default_printing_source_warehouse",
@@ -157,12 +162,40 @@
    "fieldtype": "Link",
    "label": "Stock Entry Type for Fabric Rejection",
    "options": "Stock Entry Type"
+  },
+  {
+   "fieldname": "column_break_gfkuh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "coating_item_mandatory",
+   "fieldtype": "Check",
+   "label": "Coating Mandatory in Print Order"
+  },
+  {
+   "default": "0",
+   "fieldname": "softener_item_mandatory",
+   "fieldtype": "Check",
+   "label": "Softener Mandatory in Print Order"
+  },
+  {
+   "default": "0",
+   "fieldname": "sublimation_paper_item_mandatory",
+   "fieldtype": "Check",
+   "label": "Sublimation Paper Mandatory in Print Order"
+  },
+  {
+   "default": "0",
+   "fieldname": "protection_paper_item_mandatory",
+   "fieldtype": "Check",
+   "label": "Protection Paper Mandatory in Print Order"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-07-23 12:00:12.291841",
+ "modified": "2024-08-15 13:32:39.914389",
  "modified_by": "Administrator",
  "module": "Fabric Printing",
  "name": "Fabric Printing Settings",

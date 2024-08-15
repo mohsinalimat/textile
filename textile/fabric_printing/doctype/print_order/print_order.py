@@ -306,11 +306,13 @@ class PrintOrder(TextileOrder):
 			if not self.get("process_item"):
 				frappe.throw(_("Process Item is mandatory for submission"))
 
+			settings = frappe.get_cached_doc("Fabric Printing Settings", None)
+
 			for component_item_field in printing_components:
 				if self.get(f"{component_item_field}_required"):
 					field_label = self.meta.get_label(component_item_field)
 
-					if not self.get(component_item_field):
+					if not self.get(component_item_field) and cint(settings.get(f"{component_item_field}_mandatory")):
 						frappe.throw(_("{0} is mandatory for submission").format(frappe.bold(field_label)))
 
 					component_item_name = self.get(f"{component_item_field}_name") or self.get(component_item_field)
@@ -443,8 +445,7 @@ class PrintOrder(TextileOrder):
 		process_conditions = ["p.process_item = %(process_item)s"]
 
 		for component_item_field in printing_components:
-			if self.get(f"{component_item_field}_required"):
-				process_conditions.append(f"p.{component_item_field}_required = 1")
+			if self.get(component_item_field):
 				process_conditions.append(f"p.{component_item_field} = %({component_item_field})s")
 
 				if self.meta.has_field(f"{component_item_field}_by_fabric_weight"):
@@ -455,7 +456,7 @@ class PrintOrder(TextileOrder):
 						process_conditions.append("p.fabric_per_pickup = %(fabric_per_pickup)s")
 						process_conditions.append("p.fabric_width = %(fabric_width)s")
 			else:
-				process_conditions.append(f"p.{component_item_field}_required = 0")
+				process_conditions.append(f"ifnull(p.{component_item_field}, '') = ''")
 
 			filters[component_item_field] = self.get(component_item_field)
 			filters[f"{component_item_field}_by_fabric_weight"] = cint(self.get(f"{component_item_field}_by_fabric_weight"))
@@ -1008,7 +1009,7 @@ class PrintOrder(TextileOrder):
 
 		components = []
 		for component_item_field in printing_components:
-			if self.get(f"{component_item_field}_required"):
+			if self.get(component_item_field):
 				component = frappe._dict({
 					"item_code": self.get(component_item_field),
 					"consumption_by_fabric_weight": cint(self.get(f"{component_item_field}_by_fabric_weight")),
