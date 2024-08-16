@@ -125,6 +125,7 @@ class FabricPrintingSummary:
 				AND ps.posting_date BETWEEN %(from_date)s AND %(to_date)s
 				AND ifnull(psi.print_order, '') != ''
 				AND ifnull(psi.source_packing_slip, '') = ''
+				AND psi.qty != 0
 			GROUP BY item.fabric_material
 		""", self.filters, as_dict=1)
 

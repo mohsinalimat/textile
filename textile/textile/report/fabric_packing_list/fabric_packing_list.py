@@ -44,6 +44,7 @@ class FabricPackingList:
 			WHERE ps.docstatus = 1
 				AND ps.status != 'Unpacked'
 				AND ifnull(psi.source_packing_slip, '') = ''
+				AND psi.qty != 0
 				{conditions}
 			ORDER BY ps.posting_date, ps.name, psi.idx
 		""".format(conditions=conditions), self.filters, as_dict=1)
