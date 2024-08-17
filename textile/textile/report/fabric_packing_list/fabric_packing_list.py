@@ -80,6 +80,22 @@ class FabricPackingList:
 		if self.filters.fabric_type:
 			conditions.append("item.fabric_type = %(fabric_type)s")
 
+		if self.filters.warehouse:
+			lft, rgt = frappe.db.get_value("Warehouse", self.filters.warehouse, ["lft", "rgt"])
+			conditions.append("""ps.warehouse in (select name from `tabWarehouse`
+				where lft >= {0} and rgt <= {1})""".format(lft, rgt))
+
+		# Rejected Warehouse
+		self.filters.rejected_warehouses = [
+			frappe.db.get_single_value("Fabric Printing Settings", "default_printing_rejected_warehouse"),
+			frappe.db.get_single_value("Fabric Pretreatment Settings", "default_pretreatment_rejected_warehouse"),
+		]
+		self.filters.rejected_warehouses = [v for v in self.filters.rejected_warehouses
+			if v and (not self.filters.warehouse or v != self.filters.warehouse)]
+		if self.filters.rejected_warehouses:
+			conditions.append("ps.warehouse not in %(rejected_warehouses)s")
+
+		# Delivery Status
 		self.filters.delivery_status = ['In Stock']
 		if self.filters.show_delivered:
 			self.filters.delivery_status.append('Delivered')

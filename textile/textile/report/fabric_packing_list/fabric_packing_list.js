@@ -119,6 +119,17 @@ frappe.query_reports["Fabric Packing List"] = {
 			options: "Fabric Type",
 		},
 		{
+			fieldname: "warehouse",
+			label: __("Warehouse"),
+			fieldtype: "Link",
+			options: "Warehouse",
+			get_query: function() {
+				return {
+					filters: {'company': frappe.query_report.get_filter_value("company")}
+				}
+			},
+		},
+		{
 			fieldname: "group_by_1",
 			label: __("Group By Level 1"),
 			fieldtype: "Select",
