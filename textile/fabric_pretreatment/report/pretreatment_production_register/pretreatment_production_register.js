@@ -40,7 +40,7 @@ frappe.query_reports["Pretreatment Production Register"] = {
 			label: __("Based On"),
 			fieldtype: "Select",
 			options: ["Operation Entry", "Manufacture Entry"],
-			default: "Operation",
+			default: "Operation Entry",
 			reqd: 1
 		},
 		{
