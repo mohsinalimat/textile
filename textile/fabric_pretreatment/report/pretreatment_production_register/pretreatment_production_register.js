@@ -36,6 +36,14 @@ frappe.query_reports["Pretreatment Production Register"] = {
 			reqd: 1
 		},
 		{
+			fieldname: "based_on",
+			label: __("Based On"),
+			fieldtype: "Select",
+			options: ["Operation Entry", "Manufacture Entry"],
+			default: "Operation",
+			reqd: 1
+		},
+		{
 			fieldname: "greige_fabric",
 			label: __("Greige Fabric"),
 			fieldtype: "Link",
@@ -107,6 +115,12 @@ frappe.query_reports["Pretreatment Production Register"] = {
 			}
 		},
 		{
+			fieldname: "operation",
+			label: __("Operation"),
+			fieldtype: "Link",
+			options: "Operation",
+		},
+		{
 			fieldname: "singeing_item",
 			label: __("Singeing Item"),
 			fieldtype: "Link",
@@ -171,5 +185,5 @@ frappe.query_reports["Pretreatment Production Register"] = {
 			fieldtype: "Check",
 		},
 	],
-	initial_depth: 2
+	initial_depth: 1
 };

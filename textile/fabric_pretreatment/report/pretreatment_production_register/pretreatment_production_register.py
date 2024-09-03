@@ -44,14 +44,15 @@ class PretreatmentProductionRegister:
 				wo.customer, wo.customer_name,
 				wo.production_item as ready_fabric, wo.item_name as ready_fabric_name,
 				wo.fabric_item as greige_fabric, wo.fabric_item_name as greige_fabric_name,
+				jc.name as job_card, jc.operation,
 				item.net_weight_per_unit, item.weight_uom
 			FROM `tabStock Entry` se
 			INNER JOIN `tabWork Order` wo ON wo.name = se.work_order
 			INNER JOIN `tabPretreatment Order` pro ON pro.name = wo.pretreatment_order
 			LEFT JOIN `tabItem` item ON item.name = wo.fabric_item
+			LEFT JOIN `tabJob Card` jc ON jc.name = se.job_card
 			WHERE se.docstatus = 1
 				AND se.posting_date between %(from_date)s AND %(to_date)s
-				AND se.purpose = 'Manufacture'
 				{conditions}
 			ORDER BY se.posting_date, se.posting_time
 		""".format(conditions=conditions), self.filters, as_dict=1)
@@ -68,6 +69,11 @@ class PretreatmentProductionRegister:
 
 	def get_conditions(self):
 		conditions = []
+
+		if self.filters.based_on == "Operation Entry":
+			conditions.append("se.purpose = 'Material Consumption for Manufacture'")
+		else:
+			conditions.append("se.purpose = 'Manufacture'")
 
 		if self.filters.company:
 			conditions.append("se.company = %(company)s")
@@ -95,6 +101,9 @@ class PretreatmentProductionRegister:
 
 		if self.filters.bleaching_item:
 			conditions.append("pro.bleaching_item = %(bleaching_item)s")
+
+		if self.filters.operation:
+			conditions.append("jc.operation = %(operation)s")
 
 		if self.filters.get("customer_provided_items"):
 			if self.filters.get("customer_provided_items") == "Customer Provided Fabrics Only":
@@ -129,10 +138,13 @@ class PretreatmentProductionRegister:
 	def get_grouped_data(self):
 		data = self.data
 
-		self.group_by = [None]
+		if self.filters.based_on == 'Operation Entry':
+			self.group_by = ['operation']
+		else:
+			self.group_by = [None]
+
 		for i in range(3):
 			group_label = self.filters.get("group_by_" + str(i + 1), "").replace("Group by ", "")
-
 			if group_label:
 				self.group_by.append(scrub(group_label))
 
@@ -206,22 +218,41 @@ class PretreatmentProductionRegister:
 			dates.append(current_date)
 			current_date = add_days(current_date, 1)
 
-		grand_totals = {}
-
-		for d in self.data:
-			grand_totals.setdefault(d.posting_date, 0)
-			grand_totals[d.posting_date] += d.length
-
 		labels = [frappe.format(d) for d in dates]
 
-		total_dataset = {"name": _("Total Production"), "values": []}
-		for current_date in dates:
-			total_dataset["values"].append(flt(grand_totals.get(current_date)))
+		if self.filters.based_on == 'Operation Entry':
+			operation_totals = {}
+			for d in self.data:
+				if d.operation:
+					operation_totals.setdefault(d.operation, {}).setdefault(d.posting_date, 0)
+					operation_totals[d.operation][d.posting_date] += d.length
+
+			operation_datasets = {}
+			for operation, operation_total_dict in operation_totals.items():
+				operation_datasets.setdefault(operation, {
+					"name": operation, "values": []
+				})
+				for current_date in dates:
+					operation_datasets[operation]["values"].append(flt(operation_total_dict.get(current_date)))
+
+			datasets = list(operation_datasets.values())
+
+		else:
+			grand_totals = {}
+			for d in self.data:
+				grand_totals.setdefault(d.posting_date, 0)
+				grand_totals[d.posting_date] += d.length
+
+			total_dataset = {"name": _("Total Production"), "values": []}
+			for current_date in dates:
+				total_dataset["values"].append(flt(grand_totals.get(current_date)))
+
+			datasets = [total_dataset]
 
 		self.chart_data = {
 			"data": {
 				"labels": labels,
-				'datasets': [total_dataset]
+				'datasets': datasets
 			},
 			"colors": ['purple'],
 			"type": "line",
@@ -255,6 +286,13 @@ class PretreatmentProductionRegister:
 				"fieldname": "net_weight",
 				"fieldtype": "Float",
 				"width": 100
+			},
+			{
+				"label": _("Operation"),
+				"fieldname": "operation",
+				"fieldtype": "Link",
+				"options": "Operation",
+				"width": 90
 			},
 			{
 				"label": _("Pretreatment Order"),
@@ -330,6 +368,9 @@ class PretreatmentProductionRegister:
 			})
 
 			exclude_columns.add('stock_entry')
+
+			if self.filters.based_on != "Operation Entry":
+				exclude_columns.add("operation")
 
 			if self.filters.totals_only:
 				# potential empty columns
