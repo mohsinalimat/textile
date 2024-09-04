@@ -118,9 +118,11 @@ textile.PretreatmentOrder = class PretreatmentOrder extends textile.TextileOrder
 
 			let qty_precision = precision("stock_qty");
 
-			let is_unpacked = doc.delivery_required
+			let packing_completion = flt(doc.packed_qty) + flt(doc.rejected_qty);
+
+			let is_unpacked = doc.delivery_required && doc.packing_slip_required
 				&& flt(doc.produced_qty, qty_precision)
-				&& flt(doc.packed_qty, qty_precision) < flt(doc.produced_qty, qty_precision);
+				&& flt(packing_completion, qty_precision) < flt(doc.produced_qty, qty_precision);
 
 			let is_undelivered = doc.delivery_required
 				&& flt(doc.produced_qty, qty_precision)
@@ -149,6 +151,17 @@ textile.PretreatmentOrder = class PretreatmentOrder extends textile.TextileOrder
 						this.frm.add_custom_button(__('Work Order'), () => this.create_work_order(),
 							__("Create"));
 					}
+				}
+
+				if (
+					frappe.model.can_create("Stock Entry")
+					&& (
+						(doc.delivery_required && is_unpacked)
+						|| (!doc.delivery_required && flt(doc.rejected_qty, qty_precision) < flt(doc.produced_qty, qty_precision))
+					)
+				) {
+					this.frm.add_custom_button(__('Fabric Rejection Entry'), () => this.make_fabric_rejection_entry(),
+						__("Create"));
 				}
 
 				if (is_unpacked && frappe.model.can_create("Packing Slip")) {
@@ -220,7 +233,9 @@ textile.PretreatmentOrder = class PretreatmentOrder extends textile.TextileOrder
 
 	show_progress_for_production() {
 		if (this.frm.doc.__onload?.progress_data) {
-			erpnext.manufacturing.show_progress_for_production(this.frm.doc.__onload.progress_data, this.frm);
+			let show_rejection = !this.frm.doc.delivery_required || !this.frm.doc.packing_slip_required;
+
+			erpnext.manufacturing.show_progress_for_production(this.frm.doc.__onload.progress_data, this.frm, show_rejection);
 
 			for (let row of this.frm.doc.__onload.progress_data.operations || []) {
 				erpnext.manufacturing.show_progress_for_operation(this.frm.doc.__onload.progress_data, row, this.frm);
@@ -234,35 +249,9 @@ textile.PretreatmentOrder = class PretreatmentOrder extends textile.TextileOrder
 			return;
 		}
 
-		let packed_qty = this.frm.doc.packed_qty;
-		let to_pack_qty = produced_qty - packed_qty;
-		to_pack_qty = Math.max(to_pack_qty, 0);
-
-		erpnext.utils.show_progress_for_qty({
-			frm: this.frm,
-			title: __('Packing Status'),
-			total_qty: this.frm.doc.stock_qty,
-			progress_bars: [
-				{
-					title: __('<b>Packed:</b> {0} {1} ({2}%)', [
-						frappe.format(packed_qty, {'fieldtype': 'Float'}, { inline: 1 }),
-						"Meter",
-						format_number(packed_qty / this.frm.doc.stock_qty * 100, null, 1),
-					]),
-					completed_qty: packed_qty,
-					progress_class: "progress-bar-success",
-					add_min_width: 0.5,
-				},
-				{
-					title: __("<b>To Pack:</b> {0} {1}", [
-						frappe.format(to_pack_qty, {'fieldtype': 'Float'}, { inline: 1 }),
-						"Meter"
-					]),
-					completed_qty: to_pack_qty,
-					progress_class: "progress-bar-warning",
-				},
-			],
-		});
+		if (this.frm.doc.__onload?.progress_data) {
+			erpnext.manufacturing.show_progress_for_packing(this.frm.doc.__onload.progress_data, this.frm);
+		}
 	}
 
 	show_progress_for_delivery() {
@@ -456,6 +445,22 @@ textile.PretreatmentOrder = class PretreatmentOrder extends textile.TextileOrder
 			callback: (r) => {
 				if (!r.exc) {
 					this.frm.reload_doc();
+				}
+			}
+		});
+	}
+
+	make_fabric_rejection_entry() {
+		return frappe.call({
+			method: "textile.fabric_pretreatment.doctype.pretreatment_order.pretreatment_order.make_fabric_reconciliation_entry",
+			args: {
+				"pretreatment_order": this.frm.doc.name,
+				"purpose": "Material Transfer",
+			},
+			callback: function (r) {
+				if (!r.exc) {
+					let doclist = frappe.model.sync(r.message);
+					frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
 				}
 			}
 		});

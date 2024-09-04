@@ -22,7 +22,7 @@ frappe.ui.form.on('Fabric Pretreatment Settings', {
 				}
 			};
 		});
-		frm.set_query("stock_entry_type_for_pretreatment_prodution", function(doc) {
+		frm.set_query("stock_entry_type_for_pretreatment_production", function(doc) {
 			return {
 				filters: {
 					purpose: "Manufacture",
@@ -33,6 +33,13 @@ frappe.ui.form.on('Fabric Pretreatment Settings', {
 			return {
 				filters: {
 					purpose: "Material Consumption for Manufacture",
+				}
+			};
+		});
+		frm.set_query("stock_entry_type_for_fabric_rejection", function(doc) {
+			return {
+				filters: {
+					purpose: "Material Transfer",
 				}
 			};
 		});

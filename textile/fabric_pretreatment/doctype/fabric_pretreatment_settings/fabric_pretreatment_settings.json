@@ -22,10 +22,11 @@
   "default_pretreatment_fg_warehouse",
   "stock_entry_type_section",
   "stock_entry_type_for_fabric_transfer",
+  "stock_entry_type_for_pretreatment_production",
   "column_break_r8ba8",
-  "stock_entry_type_for_operation_consumption",
+  "stock_entry_type_for_fabric_rejection",
   "column_break_n8lzz",
-  "stock_entry_type_for_pretreatment_prodution"
+  "stock_entry_type_for_operation_consumption"
  ],
  "fields": [
   {
@@ -114,12 +115,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "stock_entry_type_for_pretreatment_prodution",
-   "fieldtype": "Link",
-   "label": "Stock Entry Type for Pretreatment Prodution",
-   "options": "Stock Entry Type"
-  },
-  {
    "fieldname": "default_pretreatment_rejected_warehouse",
    "fieldtype": "Link",
    "label": "Default Rejected Warehouse",
@@ -128,12 +123,24 @@
   {
    "fieldname": "column_break_iscpi",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stock_entry_type_for_fabric_rejection",
+   "fieldtype": "Link",
+   "label": "Stock Entry Type for Fabric Rejection",
+   "options": "Stock Entry Type"
+  },
+  {
+   "fieldname": "stock_entry_type_for_pretreatment_production",
+   "fieldtype": "Link",
+   "label": "Stock Entry Type for Pretreatment Production",
+   "options": "Stock Entry Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-05-01 18:04:31.355048",
+ "modified": "2024-09-04 17:22:22.808595",
  "modified_by": "Administrator",
  "module": "Fabric Pretreatment",
  "name": "Fabric Pretreatment Settings",

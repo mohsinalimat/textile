@@ -68,23 +68,33 @@
   "tab_status",
   "status",
   "column_break_zltke",
+  "section_break_mautg",
   "ordered_qty",
   "per_ordered",
-  "section_break_mautg",
+  "column_break_3qzv3",
   "work_order_qty",
   "per_work_ordered",
+  "column_break_lfyl0",
   "subcontractable_qty",
-  "column_break_3qzv3",
+  "section_break_usc4j",
   "production_status",
+  "column_break_t31gc",
   "produced_qty",
+  "column_break_xjuts",
   "per_produced",
   "section_break_2pbh5",
   "packing_status",
+  "column_break_paad7",
   "packed_qty",
   "per_packed",
-  "column_break_paad7",
+  "column_break_akgyh",
+  "rejected_qty",
+  "per_rejected",
+  "section_break_heiiv",
   "delivery_status",
+  "column_break_ijdf8",
   "delivered_qty",
+  "column_break_y8pmm",
   "per_delivered"
  ],
  "fields": [
@@ -667,12 +677,62 @@
    "fieldtype": "Link",
    "label": "Cost Center",
    "options": "Cost Center"
+  },
+  {
+   "fieldname": "column_break_lfyl0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_usc4j",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_t31gc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_xjuts",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_akgyh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_heiiv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_ijdf8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_y8pmm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "rejected_qty",
+   "fieldtype": "Float",
+   "label": "Rejected Qty",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "per_rejected",
+   "fieldtype": "Percent",
+   "label": "% Rejected",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-03-19 18:30:03.811288",
+ "modified": "2024-09-04 16:46:29.333580",
  "modified_by": "Administrator",
  "module": "Fabric Pretreatment",
  "name": "Pretreatment Order",

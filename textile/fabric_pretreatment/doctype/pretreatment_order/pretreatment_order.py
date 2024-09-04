@@ -447,23 +447,34 @@ class PretreatmentOrder(TextileOrder):
 		self.work_order_qty = data.work_order_qty
 		self.produced_qty = data.completed_qty
 		self.packed_qty = data.packed_qty
+		self.rejected_qty = data.rejected_qty
 		self.subcontractable_qty = data.subcontractable_qty
 
 		stock_qty = flt(self.stock_qty, self.precision("qty"))
 		work_order_qty = flt(self.work_order_qty, self.precision("qty"))
 		produced_qty = flt(self.produced_qty, self.precision("qty"))
 		packed_qty = flt(self.packed_qty, self.precision("qty"))
+		rejected_qty = flt(self.rejected_qty, self.precision("qty"))
 
 		self.per_work_ordered = flt(work_order_qty / stock_qty * 100 if stock_qty else 0, 3)
 		self.per_produced = flt(produced_qty / stock_qty * 100 if stock_qty else 0, 3)
 		self.per_packed = flt(packed_qty / stock_qty * 100 if stock_qty else 0, 3)
+		self.per_rejected = flt(rejected_qty / stock_qty * 100 if stock_qty else 0, 3)
 
 		production_within_allowance = self.per_work_ordered >= 100 and self.per_produced > 0 and not data.has_work_order_to_produce
 		self.production_status = self.get_completion_status('per_produced', 'Produce',
 			not_applicable=self.status == "Closed" or not self.per_work_ordered,
 			within_allowance=production_within_allowance)
 
-		packing_within_allowance = self.per_work_ordered >= 100 and self.per_packed > 0 and not data.has_work_order_to_pack
+		is_unpacked = flt(self.produced_qty - self.packed_qty - self.rejected_qty,
+			self.precision("qty")) > 0
+
+		packing_within_allowance = (
+			self.per_work_ordered >= 100
+			and self.per_packed > 0
+			and not data.has_work_order_to_pack
+			and not is_unpacked
+		)
 		self.packing_status = self.get_completion_status('per_packed', 'Pack',
 			not_applicable=not self.delivery_required or not self.packing_slip_required or self.status == "Closed" or not self.per_produced,
 			within_allowance=packing_within_allowance)
@@ -473,11 +484,13 @@ class PretreatmentOrder(TextileOrder):
 				'work_order_qty': self.work_order_qty,
 				'produced_qty': self.produced_qty,
 				'packed_qty': self.packed_qty,
+				'rejected_qty': self.rejected_qty,
 				'subcontractable_qty': self.subcontractable_qty,
 
 				'per_work_ordered': self.per_work_ordered,
 				'per_produced': self.per_produced,
 				'per_packed': self.per_packed,
+				'per_rejected': self.per_rejected,
 
 				'production_status': self.production_status,
 				'packing_status': self.packing_status,
@@ -492,6 +505,7 @@ class PretreatmentOrder(TextileOrder):
 		out.completed_qty = 0
 		out.process_loss_qty = 0
 		out.packed_qty = 0
+		out.rejected_qty = 0
 		out.subcontractable_qty = 0
 		out.has_work_order_to_pack = False
 		out.has_work_order_to_produce = False
@@ -501,6 +515,7 @@ class PretreatmentOrder(TextileOrder):
 			work_order_data = frappe.db.sql("""
 				SELECT qty, producible_qty,
 					produced_qty, material_transferred_for_manufacturing, completed_qty, process_loss_qty,
+					packed_qty, rejected_qty,
 					production_status, packing_status, subcontracting_status
 				FROM `tabWork Order`
 				WHERE docstatus = 1 AND pretreatment_order = %s
@@ -513,6 +528,8 @@ class PretreatmentOrder(TextileOrder):
 				out.produced_qty += flt(d.produced_qty)
 				out.completed_qty += flt(d.completed_qty)
 				out.process_loss_qty += flt(d.process_loss_qty)
+				out.packed_qty = flt(d.packed_qty)
+				out.rejected_qty = flt(d.rejected_qty)
 
 				out.subcontractable_qty += max(get_subcontractable_qty(
 					d.producible_qty,
@@ -525,16 +542,6 @@ class PretreatmentOrder(TextileOrder):
 					out.has_work_order_to_produce = True
 				if d.packing_status != "Packed":
 					out.has_work_order_to_pack = True
-
-			# Packing Slips
-			packed_data = frappe.db.sql("""
-				SELECT sum(packed_qty * conversion_factor)
-				FROM `tabSales Order Item`
-				WHERE docstatus = 1 AND pretreatment_order = %s and item_code = %s
-			""", (self.name, self.ready_fabric_item))
-
-			if packed_data:
-				out.packed_qty = flt(packed_data[0][0])
 
 		return out
 
@@ -990,6 +997,64 @@ def _make_sales_order(source_name, target_doc=None, ignore_permissions=False):
 def create_work_order(pretreatment_order):
 	doc = frappe.get_doc('Pretreatment Order', pretreatment_order)
 	doc.create_work_order(ignore_permissions=frappe.has_permission("Pretreatment Order", "write"))
+
+
+@frappe.whitelist()
+def make_fabric_reconciliation_entry(pretreatment_order, purpose, for_submit=False):
+	if isinstance(pretreatment_order, str):
+		doc = frappe.get_doc('Pretreatment Order', pretreatment_order)
+	else:
+		doc = pretreatment_order
+
+	if purpose not in ("Material Transfer", "Material Issue"):
+		frappe.throw(_("Invalid Purpose"))
+
+	stock_entry = frappe.new_doc("Stock Entry")
+	stock_entry.purpose = purpose
+	stock_entry.pretreatment_order = doc.name
+	stock_entry.company = doc.company
+	stock_entry.from_warehouse = doc.fg_warehouse
+
+	if purpose == "Material Transfer":
+		stock_entry.to_warehouse = frappe.get_cached_value("Fabric Pretreatment Settings", None,
+			"default_pretreatment_rejected_warehouse")
+
+	work_orders = frappe.get_all("Work Order", filters={
+		"pretreatment_order": doc.name, "docstatus": 1
+	}, fields=[
+		"name", "production_item",
+		"completed_qty", "packed_qty", "rejected_qty", "reconciled_qty",
+		"produce_fg_in_wip_warehouse", "wip_warehouse", "fg_warehouse"
+	])
+
+	for wo in work_orders:
+		if doc.delivery_required and doc.packing_slip_required:
+			pending_qty = flt(flt(wo.completed_qty) - flt(wo.packed_qty) - flt(wo.rejected_qty) - flt(wo.reconciled_qty),
+				stock_entry.precision("qty", "items"))
+			if pending_qty <= 0:
+				continue
+		else:
+			pending_qty = 0
+
+		row = stock_entry.append("items", frappe.new_doc("Stock Entry Detail"))
+		row.work_order = wo.name
+		row.item_code = wo.production_item
+		row.s_warehouse = wo.wip_warehouse if wo.produce_fg_in_wip_warehouse else wo.fg_warehouse
+		row.t_warehouse = stock_entry.to_warehouse if purpose == "Material Transfer" else None
+		row.qty = pending_qty
+		row.uom = "Meter"
+
+	stock_entry.set_stock_entry_type()
+
+	if stock_entry.meta.has_field("cost_center") and doc.get("cost_center"):
+		stock_entry.cost_center = doc.get("cost_center")
+
+	if not for_submit:
+		stock_entry.run_method("set_missing_values")
+		stock_entry.run_method("set_actual_qty")
+		stock_entry.run_method("calculate_rate_and_amount", raise_error_if_no_rate=False)
+
+	return stock_entry
 
 
 @frappe.whitelist()

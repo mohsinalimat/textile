@@ -15,6 +15,8 @@ stock_entry_types = [
 	("Fabric Printing", "Manufacture"),
 	("Fabric Pretreatment", "Manufacture"),
 	("Pretreatment Operation", "Material Consumption for Manufacture"),
+	("Fabric Rejection", "Material Transfer"),
+	("Fabric Shrinkage", "Material Issue"),
 ]
 
 customs_tariff_numbers = [
@@ -252,13 +254,16 @@ def populate_stock_entry_types():
 	frappe.db.set_single_value("Fabric Pretreatment Settings", {
 		"stock_entry_type_for_fabric_transfer": "Fabric Transfer for Pretreatment",
 		"stock_entry_type_for_operation_consumption": "Pretreatment Operation",
-		"stock_entry_type_for_pretreatment_prodution": "Fabric Pretreatment",
+		"stock_entry_type_for_pretreatment_production": "Fabric Pretreatment",
+		"stock_entry_type_for_fabric_rejection": "Fabric Rejection",
 	})
 
 	frappe.db.set_single_value("Fabric Printing Settings", {
 		"stock_entry_type_for_fabric_transfer": "Fabric Transfer for Printing",
 		"stock_entry_type_for_print_production": "Fabric Printing",
 		"stock_entry_type_for_fabric_coating": "Fabric Coating",
+		"stock_entry_type_for_fabric_rejection": "Fabric Rejection",
+		"stock_entry_type_for_fabric_shrinkage": "Fabric Shrinkage",
 	})
 
 

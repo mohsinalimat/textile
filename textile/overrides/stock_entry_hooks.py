@@ -18,13 +18,13 @@ class StockEntryDP(StockEntry):
 	def on_submit(self):
 		super().on_submit()
 		self.update_print_order_fabric_transfer_status()
-		self.update_print_order_reconciliation_status()
+		self.update_order_reconciliation_status()
 		self.update_coating_order(validate_coating_order_qty=True)
 
 	def on_cancel(self):
 		super().on_cancel()
 		self.update_print_order_fabric_transfer_status()
-		self.update_print_order_reconciliation_status()
+		self.update_order_reconciliation_status()
 		self.update_coating_order()
 
 	def set_stock_entry_type(self):
@@ -48,11 +48,13 @@ class StockEntryDP(StockEntry):
 
 		elif self.get("pretreatment_order"):
 			if self.purpose == "Manufacture":
-				ste_type = pretreatment_settings.stock_entry_type_for_pretreatment_prodution
+				ste_type = pretreatment_settings.stock_entry_type_for_pretreatment_production
 			elif self.purpose == "Material Transfer for Manufacture":
 				ste_type = pretreatment_settings.stock_entry_type_for_fabric_transfer
 			elif self.purpose == "Material Consumption for Manufacture":
 				ste_type = pretreatment_settings.stock_entry_type_for_operation_consumption
+			elif self.purpose == "Material Transfer":
+				ste_type = pretreatment_settings.stock_entry_type_for_fabric_rejection
 
 		if ste_type:
 			self.stock_entry_type = ste_type
@@ -68,7 +70,7 @@ class StockEntryDP(StockEntry):
 			print_order.set_fabric_transfer_status(update=True)
 			print_order.notify_update()
 
-	def update_print_order_reconciliation_status(self):
+	def update_order_reconciliation_status(self):
 		if self.purpose not in ("Material Issue", "Material Transfer"):
 			return
 
@@ -76,17 +78,26 @@ class StockEntryDP(StockEntry):
 		if not work_orders:
 			return
 
-		print_orders = frappe.db.sql_list("""
-			select distinct print_order
+		wo_details = frappe.db.sql("""
+			select print_order, pretreatment_order
 			from `tabWork Order`
-			where name in %s and docstatus = 1 and ifnull(print_order, '') != ''
-		""", [work_orders])
+			where name in %s and docstatus = 1
+		""", [work_orders], as_dict=True)
+
+		pretreatment_orders = set([d.pretreatment_order for d in wo_details if d.pretreatment_order])
+		print_orders = set([d.print_order for d in wo_details if d.print_order])
+
+		for name in pretreatment_orders:
+			doc = frappe.get_doc("Pretreatment Order", name)
+			doc.set_production_packing_status(update=True)
+			doc.set_status(update=True)
+			doc.notify_update()
 
 		for name in print_orders:
-			print_order = frappe.get_doc("Print Order", name)
-			print_order.set_production_packing_status(update=True)
-			print_order.set_status(update=True)
-			print_order.notify_update()
+			doc = frappe.get_doc("Print Order", name)
+			doc.set_production_packing_status(update=True)
+			doc.set_status(update=True)
+			doc.notify_update()
 
 	def update_coating_order(self, validate_coating_order_qty=False):
 		if not self.coating_order:

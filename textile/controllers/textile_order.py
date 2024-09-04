@@ -222,7 +222,10 @@ class TextileOrder(TransactionBase):
 				sum(produced_qty) as produced_qty,
 				sum(process_loss_qty) as process_loss_qty,
 				sum(subcontract_order_qty) as subcontract_order_qty,
-				sum(subcontract_received_qty) as subcontract_received_qty
+				sum(subcontract_received_qty) as subcontract_received_qty,
+				sum(packed_qty) as packed_qty,
+				sum(rejected_qty) as rejected_qty,
+				sum(reconciled_qty) as reconciled_qty
 			from `tabWork Order`
 			where `{reference_fieldname}` = %s and docstatus = 1
 		""", self.name, as_dict=1)
@@ -237,6 +240,9 @@ class TextileOrder(TransactionBase):
 			"process_loss_qty": flt(totals.process_loss_qty),
 			"subcontract_order_qty": flt(totals.subcontract_order_qty),
 			"subcontract_received_qty": flt(totals.subcontract_received_qty),
+			"packed_qty": flt(totals.packed_qty),
+			"rejected_qty": flt(totals.rejected_qty),
+			"reconciled_qty": flt(totals.reconciled_qty),
 			"operations": []
 		})
 
