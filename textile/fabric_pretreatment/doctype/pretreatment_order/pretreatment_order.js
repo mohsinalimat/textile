@@ -235,7 +235,10 @@ textile.PretreatmentOrder = class PretreatmentOrder extends textile.TextileOrder
 		if (this.frm.doc.__onload?.progress_data) {
 			let show_rejection = !this.frm.doc.delivery_required || !this.frm.doc.packing_slip_required;
 
-			erpnext.manufacturing.show_progress_for_production(this.frm.doc.__onload.progress_data, this.frm, show_rejection);
+			erpnext.manufacturing.show_progress_for_production(this.frm.doc.__onload.progress_data, this.frm, {
+				show_rejection_reconciliation: show_rejection,
+				process_loss_label: __("Shrinked"),
+			});
 
 			for (let row of this.frm.doc.__onload.progress_data.operations || []) {
 				erpnext.manufacturing.show_progress_for_operation(this.frm.doc.__onload.progress_data, row, this.frm);

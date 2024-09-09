@@ -446,6 +446,7 @@ class PretreatmentOrder(TextileOrder):
 
 		self.work_order_qty = data.work_order_qty
 		self.produced_qty = data.completed_qty
+		self.shrinked_qty = data.shrinked_qty
 		self.packed_qty = data.packed_qty
 		self.rejected_qty = data.rejected_qty
 		self.subcontractable_qty = data.subcontractable_qty
@@ -453,11 +454,13 @@ class PretreatmentOrder(TextileOrder):
 		stock_qty = flt(self.stock_qty, self.precision("qty"))
 		work_order_qty = flt(self.work_order_qty, self.precision("qty"))
 		produced_qty = flt(self.produced_qty, self.precision("qty"))
+		shrinked_qty = flt(self.shrinked_qty, self.precision("qty"))
 		packed_qty = flt(self.packed_qty, self.precision("qty"))
 		rejected_qty = flt(self.rejected_qty, self.precision("qty"))
 
 		self.per_work_ordered = flt(work_order_qty / stock_qty * 100 if stock_qty else 0, 3)
 		self.per_produced = flt(produced_qty / stock_qty * 100 if stock_qty else 0, 3)
+		self.per_shrinked = flt(shrinked_qty / stock_qty * 100 if stock_qty else 0, 3)
 		self.per_packed = flt(packed_qty / stock_qty * 100 if stock_qty else 0, 3)
 		self.per_rejected = flt(rejected_qty / stock_qty * 100 if stock_qty else 0, 3)
 
@@ -483,12 +486,14 @@ class PretreatmentOrder(TextileOrder):
 			self.db_set({
 				'work_order_qty': self.work_order_qty,
 				'produced_qty': self.produced_qty,
+				'shrinked_qty': self.shrinked_qty,
 				'packed_qty': self.packed_qty,
 				'rejected_qty': self.rejected_qty,
 				'subcontractable_qty': self.subcontractable_qty,
 
 				'per_work_ordered': self.per_work_ordered,
 				'per_produced': self.per_produced,
+				'per_shrinked': self.per_shrinked,
 				'per_packed': self.per_packed,
 				'per_rejected': self.per_rejected,
 
@@ -502,6 +507,7 @@ class PretreatmentOrder(TextileOrder):
 		out.producible_qty = 0
 		out.material_transferred_for_manufacturing = 0
 		out.produced_qty = 0
+		out.shrinked_qty = 0
 		out.completed_qty = 0
 		out.process_loss_qty = 0
 		out.packed_qty = 0
@@ -526,6 +532,7 @@ class PretreatmentOrder(TextileOrder):
 				out.producible_qty += flt(d.producible_qty)
 				out.material_transferred_for_manufacturing += flt(d.material_transferred_for_manufacturing)
 				out.produced_qty += flt(d.produced_qty)
+				out.shrinked_qty += flt(d.process_loss_qty)
 				out.completed_qty += flt(d.completed_qty)
 				out.process_loss_qty += flt(d.process_loss_qty)
 				out.packed_qty = flt(d.packed_qty)
@@ -535,7 +542,6 @@ class PretreatmentOrder(TextileOrder):
 					d.producible_qty,
 					d.material_transferred_for_manufacturing,
 					d.produced_qty,
-					d.process_loss_qty
 				), 0)
 
 				if d.production_status == "To Produce" or d.subcontracting_status == "To Receive":
